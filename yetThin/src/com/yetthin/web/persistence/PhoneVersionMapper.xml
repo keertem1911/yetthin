@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.PhoneVersionMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.PhoneVersion" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="version_code" property="versionCode" jdbcType="VARCHAR" />
+    <result column="version_name" property="versionName" jdbcType="VARCHAR" />
+    <result column="apk_url" property="apkUrl" jdbcType="VARCHAR" />
+    <result column="Eexplain" property="explain" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, version_code, version_name, apk_url, Eexplain
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from phoneversion
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from phoneversion
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.PhoneVersion" >
+    
+    insert into phoneversion (version_code, version_name, 
+      apk_url, Eexplain)
+    values (#{versionCode,jdbcType=VARCHAR}, #{versionName,jdbcType=VARCHAR}, 
+      #{apkUrl,jdbcType=VARCHAR}, #{explain,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.PhoneVersion" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into phoneversion
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      ID,
+      <if test="versionCode != null" >
+        version_code,
+      </if>
+      <if test="versionName != null" >
+        version_name,
+      </if>
+      <if test="apkUrl != null" >
+        apk_url,
+      </if>
+      <if test="explain != null" >
+        Eexplain,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{id,jdbcType=INTEGER},
+      <if test="versionCode != null" >
+        #{versionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="versionName != null" >
+        #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="apkUrl != null" >
+        #{apkUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="explain != null" >
+        #{explain,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.PhoneVersion" >
+    update phoneversion
+    <set >
+      <if test="versionCode != null" >
+        version_code = #{versionCode,jdbcType=VARCHAR},
+      </if>
+      <if test="versionName != null" >
+        version_name = #{versionName,jdbcType=VARCHAR},
+      </if>
+      <if test="apkUrl != null" >
+        apk_url = #{apkUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="explain != null" >
+        Eexplain = #{explain,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.PhoneVersion" >
+    update phoneversion
+    set version_code = #{versionCode,jdbcType=VARCHAR},
+      version_name = #{versionName,jdbcType=VARCHAR},
+      apk_url = #{apkUrl,jdbcType=VARCHAR},
+      Eexplain = #{explain,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.UserInfo" >
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="phone_num" property="phoneNum" jdbcType="VARCHAR" />
+    <result column="my_money" property="myMoney" jdbcType="DOUBLE" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="Jpush_id" property="jpushId" jdbcType="VARCHAR" />
+    <result column="Jpush_status" property="jpushStatus" jdbcType="INTEGER" />
+    <result column="Jpush_type" property="jpushType" jdbcType="VARCHAR"/>
+    <result column="verify_email" property="verifyEmail" jdbcType="VARCHAR" ></result>
+        <result column="register_time" property="registerTime"  jdbcType="VARCHAR"></result>
+        <result column="email_status" property="emailStatus" jdbcType="VARCHAR" ></result>
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.yetthin.web.domain.UserInfo" extends="BaseResultMap" >
+    <result column="idea_text" property="ideaText" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+   <resultMap id="ideaTextMap" type="com.yetthin.web.domain.UserInfo" extends="ResultMapWithBLOBs">
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="phone_num" property="phoneNum" jdbcType="VARCHAR" />
+		
+  </resultMap>
+  <sql id="Base_Column_List" >
+    user_id, phone_num, my_money, email, password, Jpush_id, Jpush_status, Jpush_type,verify_email,register_time,email_status
+  </sql>
+  <sql id="ideaText_List">
+  	user_id,phone_num,idea_text
+  </sql>
+  <sql id="Blob_Column_List" >
+    idea_text
+  </sql>
+  <select id="lookIdeaText" resultMap="ideaTextMap">
+  	select
+  	<include refid="ideaText_List"></include>
+  	from userinfo
+  </select>
+   <select id="getAllUser" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from userinfo
+    
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from userinfo
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPhoneNum" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from userinfo
+    where phone_num = #{phoneNum,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByEmail" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from userinfo
+    where email = #{email,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from userinfo
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.UserInfo" >
+    
+    insert into userinfo (user_id, phone_num, my_money, 
+      email, password, Jpush_id, 
+      Jpush_status, idea_text,jpush_type,verify_email,register_time,email_status)
+    values (#{userId,jdbcType=VARCHAR}, #{phoneNum,jdbcType=VARCHAR}, #{myMoney,jdbcType=DOUBLE}, 
+      #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{jpushId,jdbcType=VARCHAR}, 
+      #{jpushStatus,jdbcType=INTEGER}, #{ideaText,jdbcType=LONGVARCHAR},#{jpushType,jdbcType=VARCHAR},#{verifyEmail,jdbcType=VARCHAR},#{registerTime,jdbcType=VARCHAR},#{emailStatus,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.UserInfo" >
+     
+    insert into userinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      user_id,
+      <if test="phoneNum != null" >
+        phone_num,
+      </if>
+      <if test="myMoney != null" >
+        my_money,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="jpushId != null" >
+        Jpush_id,
+      </if>
+      <if test="jpushStatus != null" >
+       Jpush_status,
+      </if>
+      <if test="ideaText != null" >
+        idea_text,
+      </if>
+      <if test="jpushType!=null">
+      	jpush_type
+      </if>
+      <if test="verifyEmail !=null">
+      	verify_email
+      </if>
+      <if test="registerTime !=null">
+      register_time
+      </if>
+      <if test="emailStatus !=null">
+      	email_status
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{userId,jdbcType=VARCHAR},
+      <if test="phoneNum != null" >
+        #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="myMoney != null" >
+        #{myMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="jpushId != null" >
+        #{jpushId,jdbcType=VARCHAR},
+      </if>
+      <if test="jpushStatus != null" >
+        #{jpushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="ideaText != null" >
+        #{ideaText,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="jpushType !=null">
+           #{jpushType,jdbcType=VARCHAR},
+      </if>
+	<if test="verifyEmail !=null">
+		#{verify_email,jdbcType=VARCHAR},
+	</if>
+	<if test="registerTime!=null">
+		#{registerTime,jdbcType=VARCHAR},
+	</if>
+	<if test="emailStatus !=null">
+		#{emailStatus,jdbcType=VARCHAR}
+	</if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.UserInfo" >
+    update userinfo
+    <set >
+      <if test="phoneNum != null" >
+        phone_num = #{phoneNum,jdbcType=VARCHAR},
+      </if>
+      <if test="myMoney != null" >
+        my_money = #{myMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="jpushId != null" >
+        Jpush_id = #{jpushId,jdbcType=VARCHAR},
+      </if>
+      <if test="jpushType !=null">
+      	Jpush_type = #{jpushType,jdbcType=VARCHAR},
+      </if>
+      <if test="jpushStatus != null" >
+        Jpush_status = #{jpushStatus,jdbcType=INTEGER},
+      </if>
+      <if test="ideaText != null" >
+        idea_text = #{ideaText,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="verifyEmail!=null ">
+      verify_email =#{verifyEmail,jdbcType=VARCHAR},
+      </if>
+      <if test="registerTime !=null">
+      register_time =#{registerTime,jdbcType=VARCHAR},
+      </if>
+      <if test="emailStatus !=null">
+      email_status=#{emailStatus,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yetthin.web.domain.UserInfo" >
+    update userinfo
+    set phone_num = #{phoneNum,jdbcType=VARCHAR},
+      my_money = #{myMoney,jdbcType=DOUBLE},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      Jpush_id = #{jpushId,jdbcType=VARCHAR},
+      Jpush_status = #{jpushStatus,jdbcType=INTEGER},
+    	Jpush_type=#{jpushType,jdbcType=VARCHAR}
+      idea_text = #{ideaText,jdbcType=LONGVARCHAR},
+      verify_email = #{verifyEmail,jdbcType=VARCHAR},
+      register_time =#{registerTime,jdbcType=VARCHAR},
+      email_status =#{emailStatus,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.UserInfo" >
+    update userinfo
+    set phone_num = #{phoneNum,jdbcType=VARCHAR},
+      my_money = #{myMoney,jdbcType=DOUBLE},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      Jpush_id = #{jpushId,jdbcType=VARCHAR},
+      Jpush_status = #{jpushStatus,jdbcType=INTEGER},
+      verify_email = #{verifyEmail,jdbcType=VARCHAR},
+        register_time =#{registerTime,jdbcType=VARCHAR},
+         email_status =#{emailStatus,jdbcType=VARCHAR}
+    where user_id = #{userId,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <select id="selectByPhoneNumAndPassWord" parameterType="java.util.Map"
+  resultMap="BaseResultMap" >
+  select 
+  <include refid="Base_Column_List"></include>
+  from userinfo where phone_num =#{phone,jdbcType=VARCHAR}
+  AND password =#{password,jdbcType=VARCHAR}
+  
+  </select>
+  <select id="findVerifyEmailByEmail"  parameterType="java.lang.String"  resultMap="BaseResultMap" >
+ 	select
+ 	<include refid="Base_Column_List"></include>
+  from userinfo
+  where email= #{email,jdbcType=VARCHAR}
+  </select>
+</mapper>

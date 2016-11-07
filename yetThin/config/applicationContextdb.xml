@@ -4,10 +4,12 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="location">
+		<property name="locations">
 			<list>
 				<value>classpath:db.properties</value>
+				<value>classpath:email.properties</value>
 			</list>
 		</property>
 	</bean>
+
 </beans>

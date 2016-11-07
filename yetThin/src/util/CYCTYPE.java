@@ -1,0 +1,14 @@
+package util;
+
+public enum CYCTYPE {
+	CYC_SECOND,
+	CYC_MINUTE,
+	CYC_DAY,
+	CYC_WEEK,
+	CYC_MONTH,
+	CYC_SEASON,
+	CYC_HAFLYEAR,
+	CYC_YEAR,
+	CYC_TICKBAR,
+
+}
