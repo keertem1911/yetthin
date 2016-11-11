@@ -6,5 +6,6 @@ public interface IndexPageContextService {
 		String getBestIncomeList(int pageNum,int pageSize, String path);
 		String getCurrentIncomeList(String groupNameOrId,int pageNum,int pageSize,int type);
 		String getUserGroups(String userName, int pageNum, int pageSize);
+		String getStockBySearchLike(String stockCode, int limitNum);
 		
 }

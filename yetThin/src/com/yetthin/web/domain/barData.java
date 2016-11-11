@@ -23,85 +23,87 @@ public class barData {
 
     private Integer sid;
 
-    public Integer getId() {
-        return id;
-    }
+    
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public Integer getId() {
+		return id;
+	}
 
-    public Date getDatetime() {
-        return datetime;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public void setDatetime(Date datetime) {
-        this.datetime = datetime;
-    }
+	public Date getDatetime() {
+		return datetime;
+	}
 
-    public String getOpen() {
-        return open;
-    }
+	public void setDatetime(Date datetime) {
+		this.datetime = datetime;
+	}
 
-    public void setOpen(String open) {
-        this.open = open;
-    }
+	public String getOpen() {
+		return open;
+	}
 
-    public String getHeight() {
-        return height;
-    }
+	public void setOpen(String open) {
+		this.open = open;
+	}
 
-    public void setHeight(String height) {
-        this.height = height;
-    }
+	public String getHeight() {
+		return height;
+	}
 
-    public String getLow() {
-        return low;
-    }
+	public void setHeight(String height) {
+		this.height = height;
+	}
 
-    public void setLow(String low) {
-        this.low = low;
-    }
+	public String getLow() {
+		return low;
+	}
 
-    public String getClose() {
-        return close;
-    }
+	public void setLow(String low) {
+		this.low = low;
+	}
 
-    public void setClose(String close) {
-        this.close = close;
-    }
+	public String getClose() {
+		return close;
+	}
 
-    public String getYstclose() {
-        return ystclose;
-    }
+	public void setClose(String close) {
+		this.close = close;
+	}
 
-    public void setYstclose(String ystclose) {
-        this.ystclose = ystclose;
-    }
+	public String getYstclose() {
+		return ystclose;
+	}
 
-    public String getVolume() {
-        return volume;
-    }
+	public void setYstclose(String ystclose) {
+		this.ystclose = ystclose;
+	}
 
-    public void setVolume(String volume) {
-        this.volume = volume;
-    }
+	public String getVolume() {
+		return volume;
+	}
 
-    public String getMatchitems() {
-        return matchitems;
-    }
+	public void setVolume(String volume) {
+		this.volume = volume;
+	}
 
-    public void setMatchitems(String matchitems) {
-        this.matchitems = matchitems;
-    }
+	public String getMatchitems() {
+		return matchitems;
+	}
 
-    public Integer getSid() {
-        return sid;
-    }
+	public void setMatchitems(String matchitems) {
+		this.matchitems = matchitems;
+	}
 
-    public void setSid(Integer sid) {
-        this.sid = sid;
-    }
+	public Integer getSid() {
+		return sid;
+	}
+
+	public void setSid(Integer sid) {
+		this.sid = sid;
+	}
 
 	public barData() {
 		 

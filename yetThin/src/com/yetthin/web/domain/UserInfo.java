@@ -28,7 +28,10 @@ public class UserInfo {
      private String registerTime;
      
      private String emailStatus;
-     public String getEmailStatus() {
+    
+     
+     
+	public String getEmailStatus() {
 		return emailStatus;
 	}
      public void setEmailStatus(String emailStatus) {
@@ -204,8 +207,9 @@ public class UserInfo {
 		return "UserInfo [userId=" + userId + ", phoneNum=" + phoneNum + ", myMoney=" + myMoney + ", email=" + email
 				+ ", password=" + password + ", jpushId=" + jpushId + ", jpushStatus=" + jpushStatus + ", ideaText="
 				+ ideaText + ", jpushType=" + jpushType + ", verifyEmail=" + verifyEmail + ", registerTime="
-				+ registerTime + "]";
+				+ registerTime + ", emailStatus=" + emailStatus + "]";
 	}
+	 
 
  
 	

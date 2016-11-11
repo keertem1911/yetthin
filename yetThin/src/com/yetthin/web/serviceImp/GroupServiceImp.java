@@ -1,6 +1,7 @@
 package com.yetthin.web.serviceImp;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,10 +10,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
-import org.apache.catalina.tribes.util.Arrays;
-import org.codehaus.jackson.map.ser.ArraySerializers;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.Model;
 
 import com.yetthin.web.domain.Evaluation;
 import com.yetthin.web.domain.GroupAnalyse;
@@ -23,12 +21,16 @@ import com.yetthin.web.domain.Model2Info;
 import com.yetthin.web.domain.StockOfGroup;
 import com.yetthin.web.domain.StockOfGroupget;
 import com.yetthin.web.domain.StockOfGroupreq;
+import com.yetthin.web.domain.StockSaveEmpty;
 import com.yetthin.web.domain.StockType;
 import com.alibaba.fastjson.JSON;
 import com.yetthin.web.domain.Summarize;
 import com.yetthin.web.domain.UpPersonComment;
 import com.yetthin.web.persistence.GroupMapper;
 import com.yetthin.web.service.GroupService;
+
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
 @Service("GroupService")
 public class GroupServiceImp extends BaseService implements GroupService{
 	
@@ -39,13 +41,16 @@ public class GroupServiceImp extends BaseService implements GroupService{
 			{"有色金属冶炼和压延加工业,专用设备制造业,房屋建筑业,煤炭开采和洗选业,其他服务业,道路运输业,机动车、电子产品和日用产品修理业","概念1,概念2,概念3,","市场1,市场2,市场3,市场4,市场5"},
 			{"沪深300,上证50,中证500,恒生指数,H股指数","上期所,大商所,郑商所,上金所"},
 			{"50ETF,180ETF(仿真),300ETF(仿真),上证50(仿真)","股票期权1,股票期权2,股票期权3","期货期权1,期货期权2,期货期权3"}};
+	
 	private List<Model2Info> readLable(int stockType,int index){
-		List<Model2Info> list=new ArrayList<>();
+		List<Model2Info> list=new ArrayList<>(); 	
 		String [] split=STOCK_TYPE_INDEX3[stockType][index].split(",");
 		for (int i = 0; i < split.length; i++) {
 			Model2Info info=new Model2Info(i+"",split[i]);
 			list.add(info);
+			
 		}
+		 
 		return list;
 	}
 	@Resource
@@ -63,7 +68,7 @@ public class GroupServiceImp extends BaseService implements GroupService{
 	
 	}
 	@Override
-	public String getRecommend(String nameOrid) {
+	public String getRecommend(String nameOrid,String path) {
 		// TODO Auto-generated method stub
 		boolean flag =regonizedisName(nameOrid);
 		List<GroupRecommend> lists=null;
@@ -80,18 +85,23 @@ public class GroupServiceImp extends BaseService implements GroupService{
 		for (int i = 0; i < str.length; i++) {
 			GroupRecommend list = new GroupRecommend();
 			list.setBelongGroupId("ea193c352fda49de8e34f319ec411960");
+			list.setUserImg(path+"/image/"+"user-"+list.getBelongGroupId()+".jpg");
 			list.setCommentContext(str[i]);
 			cal.set(Calendar.HOUR_OF_DAY, 8+i);
 			list.setCommentTime(format_hhmm.format(cal.getTime()));
 			list.setRecommendPerson("午夜草"+i);
 			List<UpPersonComment> ups=new ArrayList<>();
-			
+			list.setBelongUserId("ebj3ihvws");
+			String last=list.getBelongUserId();
 			for (int j = 0; j < repate[i].length; j++) {
 				UpPersonComment c=new UpPersonComment();
 				c.setFromName("午夜草"+i);
 				String [] value =repate[i][j].split(":");
 				c.setName(value[0]);
 				c.setRepateContext(value[1]);
+				c.setUserid("wdasfevg"+i);
+				c.setRepeateId(last);
+				last=c.getUserid();
 				ups.add(c);
 			}
 			list.setUpPersonComments(ups);
@@ -182,9 +192,26 @@ public class GroupServiceImp extends BaseService implements GroupService{
 		
 		return json;
 	}
+	/**
+	 * 
+	 */
 	@Override
 	public String stockOfGroupSave(StockOfGroup stockOfGroup) {
 		// TODO Auto-generated method stub
+		List<StockSaveEmpty> stockSaves=new ArrayList<>();
+		System.out.println(stockOfGroup);
+		JSONObject jsonobject =JSONObject.fromObject("{ \"value\":"+stockOfGroup.getStock()+"}");
+		JSONArray jsonarray= jsonobject.getJSONArray("value");
+		for(int i =0;i<jsonarray.size();++i){
+			 Object  subjson =  jsonarray.get(i);
+			 JSONObject object =JSONObject.fromObject(subjson);
+			 StockSaveEmpty sa=new StockSaveEmpty();
+			 
+			 sa.setStockCode(object.getString("stockCode"));
+			 sa.setStockRatio(object.getString("stockRatio"));
+			 stockSaves.add(sa);
+		}
+		System.out.println(java.util.Arrays.asList(stockSaves));
 		String json =null;
 //		int status =groupMapper.insertStockOfGroup(stockOfGroup);
 		int status =1;
@@ -192,16 +219,32 @@ public class GroupServiceImp extends BaseService implements GroupService{
 		else json ="{\"status\":\"500\"}";
 		return json;
 	}
+	private static final String [] INVEST_CAP={"10万以下","10万到100万","100万到1000万","1000万到1亿","一亿以上"};
+	private static final String   [] STOCK_COUNT = {"10","20","30","40","50"};
+	private static final String [] INVEST_TIME={"日内","30天","90天","360天","两年","三年","长期"};
+	private static final String [] STRATEGY_TYPE={"保守型","稳健型","激励型","权变型","稀有型"};
 	@Override
 	public String getStockofGroup(StockOfGroupreq req) {
 		// TODO Auto-generated method stub
-		 
+		String stocklable= req.getSelectedModels();
+		Map<String , String  []> stockSelectList =new HashMap<>();
+		// 1-0:2,3;1-1:1,2;
+		String [] Level1Index= stocklable.split(";");
+		for (String string : Level1Index) {
+			String [] keyValue=string.split(":");
+			stockSelectList.put(keyValue[0], keyValue[1].split(","));
+		}
+		Map<String , String > keyValueSelect =new HashMap<>();
+		keyValueSelect.put("inverstCap", INVEST_CAP[req.getInvestCap()]);
+		keyValueSelect.put("stockCount", STOCK_COUNT[req.getStockCount()]);
+		keyValueSelect.put("investTime", INVEST_TIME[req.getInvestTime()]);
+		keyValueSelect.put("strategyType", STRATEGY_TYPE[req.getStrategyID()]);
 //		List<StockOfGroupget> lists= groupMapper.getStockOfGroup(req);
 		List<StockOfGroupget> lists=new ArrayList<>();
 		String [] radio={"21.4","22","11.2","1.2","4.3","6.5","8.8"};
 		for(int i=1;i<8;++i){
 		StockOfGroupget get =new StockOfGroupget();
-		get.setStockCode("00000"+i);
+		get.setStockCode("00000"+i+".SZ");
 		get.setStockName("万科"+i);
 		get.setStockRatio(radio[i-1]);
 		get.setStockType("0");
@@ -282,7 +325,7 @@ public class GroupServiceImp extends BaseService implements GroupService{
 		
 	}
 	@Override
-	public String saveRecommend(String groupNameOrId, String belongId, String upRecommendUserId, String context) {
+	public String saveRecommend(String groupNameOrId, String belongId, String upRecommendUserId, String context,String userId) {
 		// TODO Auto-generated method stub
 		String json =null;
 		Map<String, String> map =new HashMap<>();
@@ -295,8 +338,8 @@ public class GroupServiceImp extends BaseService implements GroupService{
 		else json ="{\"status\":\"520\"}";
 		return json;
 	}
+ 
 
-	
 	 
 
 }

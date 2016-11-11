@@ -3,10 +3,10 @@ package com.yetthin.web.domain;
 public class StockOfGroupreq {
 	private String selectedModels;
 	private String strategyType;
-	private String strategyID;
-	private String investCap;
-	private String stockCount;
-	private String investTime;
+	private int strategyID;
+	private int investCap;
+	private int stockCount;
+	private int investTime;
 	public String getSelectedModels() {
 		return selectedModels;
 	}
@@ -19,29 +19,36 @@ public class StockOfGroupreq {
 	public void setStrategyType(String strategyType) {
 		this.strategyType = strategyType;
 	}
-	public String getStrategyID() {
+	public int getStrategyID() {
 		return strategyID;
 	}
-	public void setStrategyID(String strategyID) {
+	public void setStrategyID(int strategyID) {
 		this.strategyID = strategyID;
 	}
-	public String getInvestCap() {
+	public int getInvestCap() {
 		return investCap;
 	}
-	public void setInvestCap(String investCap) {
+	public void setInvestCap(int investCap) {
 		this.investCap = investCap;
 	}
-	public String getStockCount() {
+	public int getStockCount() {
 		return stockCount;
 	}
-	public void setStockCount(String stockCount) {
+	public void setStockCount(int stockCount) {
 		this.stockCount = stockCount;
 	}
-	public String getInvestTime() {
+	public int getInvestTime() {
 		return investTime;
 	}
-	public void setInvestTime(String investTime) {
+	public void setInvestTime(int investTime) {
 		this.investTime = investTime;
 	}
+	@Override
+	public String toString() {
+		return "StockOfGroupreq [selectedModels=" + selectedModels + ", strategyType=" + strategyType + ", strategyID="
+				+ strategyID + ", investCap=" + investCap + ", stockCount=" + stockCount + ", investTime=" + investTime
+				+ "]";
+	}
+	
 	
 }

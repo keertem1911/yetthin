@@ -6,8 +6,15 @@ public class StockOfGroup {
 	private String initMoney;
 	private String strategyId;
 	private String indexCode;
-	private String stockCode;
-	private String stockRatio;
+	private String stock;
+	private String ifOpen;
+	
+	public String getIfOpen() {
+		return ifOpen;
+	}
+	public void setIfOpen(String ifOpen) {
+		this.ifOpen = ifOpen;
+	}
 	public String getGroupName() {
 		return groupName;
 	}
@@ -38,17 +45,19 @@ public class StockOfGroup {
 	public void setIndexCode(String indexCode) {
 		this.indexCode = indexCode;
 	}
-	public String getStockCode() {
-		return stockCode;
+	public String getStock() {
+		return stock;
 	}
-	public void setStockCode(String stockCode) {
-		this.stockCode = stockCode;
+	public void setStock(String stock) {
+		this.stock = stock;
 	}
-	public String getStockRatio() {
-		return stockRatio;
-	}
-	public void setStockRatio(String stockRatio) {
-		this.stockRatio = stockRatio;
+	@Override
+	public String toString() {
+		return "StockOfGroup [groupName=" + groupName + ", userID=" + userID + ", initMoney=" + initMoney
+				+ ", strategyId=" + strategyId + ", indexCode=" + indexCode + ", stock=" + stock + ", ifOpen=" + ifOpen
+				+ "]";
 	}
 	
+
+	 
 }

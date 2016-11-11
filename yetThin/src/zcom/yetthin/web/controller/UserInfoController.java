@@ -3,6 +3,7 @@ package zcom.yetthin.web.controller;
  
  
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -504,12 +505,22 @@ public class UserInfoController extends BaseController{
 				if(user!=null){
 				String path=request.getSession().getServletContext().getRealPath("/");
 				System.out.println(path);
-				String savepicture=path+"picture";
-				File directory=new File(savepicture);
+				String savepicture=path+"image";
+				File directory=new File(savepicture+"/user-"+userId+".jpg");
+				 
 				if(directory.exists()==false){
 					directory.mkdirs();
 				}
-			
+				try {
+					file.transferTo(directory);
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 //				InputStream is=file.getInputStream();
 // 				OutputStream out=FileUtils.openOutputStream(new File(savepicture++"/"+user.));
 				}else{

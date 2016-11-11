@@ -15,15 +15,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
 
 import java.util.Map.Entry;
 
-import org.mybatis.spring.SqlSessionTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.sun.java.util.jar.pack.DriverResource_zh_CN;
 import com.yetthin.web.commit.JtdoaValueMarket;
 import com.yetthin.web.commit.QQMarketLevelUtilByMaster;
 import com.yetthin.web.commit.QQMarketLevelUtilBySimple;
@@ -31,8 +27,6 @@ import com.yetthin.web.commit.RedisUtil;
 import com.yetthin.web.commit.SinaMarketIndex;
 import com.yetthin.web.commit.ValueFormatUtil;
 import com.yetthin.web.domain.barData;
-import com.yetthin.web.persistence.UserInfoMapper;
-import com.yetthin.web.persistence.barDataMapper;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -42,7 +36,7 @@ public class JtdoaAPIDao implements
 	QQMarketLevelUtilByMaster,QQMarketLevelUtilBySimple,SinaMarketIndex,ValueFormatUtil,JtdoaValueMarket{
 	
 	private static final int KS_SELECT=5;
-	private static final int KM_SELECT=4;
+	//private static final int KM_SELECT=4;
 	
 	private static Map<Integer, String> lastMysqlDay=null; 
 	 

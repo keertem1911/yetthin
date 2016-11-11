@@ -72,5 +72,16 @@
 		<input type="text" name="pageSize"/><br>
 		<input type="submit" value="submit"/>
 	</form>
+	<br/>
+		<label>股票模糊搜索</label>
+	<form action="${pageContext.request.contextPath }/searchStockCode" method="post">
+		<label>输入内容</label>
+		<input type="text" name="stockCode"/><br>
+		<label>搜索数量</label>
+		<input type="text" name="limitNum"/><br>
+		<input type="submit" value="submit"/>
+	</form>
+	
+	<br/>
 </body>
 </html>

@@ -1,5 +1,6 @@
 package zcom.yetthin.web.controller;
 
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+ 
 import com.yetthin.web.domain.StockOfGroup;
 import com.yetthin.web.domain.StockOfGroupreq;
 import com.yetthin.web.service.GroupService;
+
 
 @Controller
 @RequestMapping(value="/group")
@@ -50,9 +53,11 @@ public class GroupController {
 	@ResponseBody
 	@RequestMapping(value="/Recommend",method=RequestMethod.POST,
 			produces={"application/json;charset=utf-8"})
-	public String getRecommend(@RequestParam(value="groupNameOrId")String groupNameOrId){
+	public String getRecommend(@RequestParam(value="groupNameOrId")String groupNameOrId,
+			HttpServletRequest req){
 		String json =null;
-		json =groupService.getRecommend(groupNameOrId);
+		StringBuffer path =req.getRequestURL();
+		json =groupService.getRecommend(groupNameOrId,path.toString().split("/group")[0]);
 		return json ;
 	}
 	@ResponseBody
@@ -61,9 +66,10 @@ public class GroupController {
 	public String saveRecommend(@RequestParam(value="groupNameOrId")String groupNameOrId,
 			@RequestParam(value="belongGroupId")String belongId,
 			@RequestParam(value="upRecommendUserId")String upRecommendUserId,
-			@RequestParam(value="repateContext")String context){
+			@RequestParam(value="repateContext")String context,
+			@RequestParam(value="userId")String userid){
 		String json =null;
-		json =groupService.saveRecommend(groupNameOrId,belongId,upRecommendUserId,context);
+		json =groupService.saveRecommend(groupNameOrId,belongId,upRecommendUserId,context,userid);
 		return json;
 	}
 	
@@ -97,15 +103,17 @@ public class GroupController {
 	produces={"application/json;charset=utf-8"})
 	public String getStockofGroup(StockOfGroupreq req){
 		String json =null;
-		
+		System.out.println(req);
 		json =groupService.getStockofGroup(req);
 		return json ;
 	}
+	
 	@ResponseBody
-	@RequestMapping(value="/stockofgroupSave",method=RequestMethod.POST,
+	@RequestMapping(value="/stocksofgroupSave",method=RequestMethod.POST,
 	produces={"application/json;charset=utf-8"})
 	public String SotckofGroupSave(StockOfGroup stockOfGroup){
 		String json =null;
+		
 		json =groupService.stockOfGroupSave(stockOfGroup);
 		return json ;
 	}

@@ -66,7 +66,7 @@ public class BaseService {
 			Method method = clazz.getDeclaredMethod("get"+fiedlsName[j]);
 			Object value = method.invoke(list.get(i));
 			String name =fiedlsName[j].substring(0, 1).toLowerCase()+fiedlsName[j].substring(1);
-			
+			if(value!=null)
 			buffer.append("\""+name+"\":\""+value+"\"");
 			
 			if(j!=fiedlsName.length-1)

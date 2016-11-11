@@ -4,7 +4,7 @@ import com.yetthin.web.domain.StockOfGroup;
 import com.yetthin.web.domain.StockOfGroupreq;
 
 public interface GroupService {
-	String getRecommend(String nameOrid);
+	String getRecommend(String nameOrid,String path);
 	String getAnalyse(String nameOrid);
 	String getComponent(String nameOrid);
 	String getDetail(String nameOrid,String path);
@@ -13,6 +13,7 @@ public interface GroupService {
 	String getStockTypeList(int stockType);
 	String getSummarize(int pageNum, int pageSize);
 	String getStockType();
-	String saveRecommend(String groupNameOrId, String belongId, String upRecommendUserId, String context);
+	String saveRecommend(String groupNameOrId, String belongId,
+			String upRecommendUserId, String context,String userId);
 	
 }

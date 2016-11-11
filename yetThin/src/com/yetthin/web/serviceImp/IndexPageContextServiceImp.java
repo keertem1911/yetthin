@@ -8,7 +8,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -20,7 +22,9 @@ import com.yetthin.web.domain.CurrentIncome;
 import com.yetthin.web.domain.CurrentValue;
 import com.yetthin.web.domain.HeroIncome;
 import com.yetthin.web.domain.RecommendList;
+import com.yetthin.web.domain.StockInfo;
 import com.yetthin.web.domain.UserGroups;
+import com.yetthin.web.domain.stockKempty;
 import com.yetthin.web.persistence.IndexPageContextMapper;
 import com.yetthin.web.service.IndexPageContextService;
 @Service("IndexPageContextService")
@@ -139,6 +143,17 @@ public class IndexPageContextServiceImp extends BaseService implements IndexPage
 		json="{\"currentPage\":\""+pageNum+"\",\"totlePageSize\":\""+
 				totlePage+"\","+json+"}";
 		return json;
+	}
+
+	@Override
+	public String getStockBySearchLike(String stockCode, int limitNum) {
+		// TODO Auto-generated method stub
+		Map<String, Object > map=new HashMap<>();
+		map.put("stockCode", "%"+stockCode+"%");
+		map.put("num",limitNum);
+		List<StockInfo> stokelimites= indexPageContextMapper.getStockBySearchLike(map);
+		String json =tojson(stokelimites);
+		return "{"+json+"}";
 	}
 
 }

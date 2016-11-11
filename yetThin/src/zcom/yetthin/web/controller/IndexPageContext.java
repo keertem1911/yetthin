@@ -22,7 +22,7 @@ public class IndexPageContext {
 	private IndexPageContextService IndexPageContextService;
 	@ResponseBody
 	@RequestMapping(value="/incomeRecommendList",method=RequestMethod.POST,
-	produces={"application/json;charset=utf-8"})
+			produces={"application/json;charset=utf-8"})
 	public String incomeRecommendList(
 			@RequestParam(value="IncomeType")int type,
 			@RequestParam(value="pageNum")int pageNum,
@@ -88,5 +88,14 @@ public class IndexPageContext {
 		}
 		System.out.println(path);
 		return "200";
+	}
+	@RequestMapping(value="/searchStockCode",method=RequestMethod.POST,
+			produces={"application/json;charset=utf-8"})
+	@ResponseBody
+	public String getSearchStockCode(@RequestParam(value="stockCode")String stockCode,
+			@RequestParam(value="limitNum")int limitNum){
+		String json= null;
+		json =IndexPageContextService.getStockBySearchLike(stockCode,limitNum);
+		return json;
 	}
 }

@@ -5,13 +5,33 @@ import java.util.List;
 public class GroupRecommend {
 	private String belongGroupId ;
 	private String recommendPerson ;
+	private String belongUserId;
 	private String vipFlag ;
 	private String commentTime ;
+	private String userImg;
 	private List<UpPersonComment> upPersonComments ;
 	private String commentContext ;
+	
+	public String getBelongUserId() {
+		return belongUserId;
+	}
+
+	public void setBelongUserId(String belongUserId) {
+		this.belongUserId = belongUserId;
+	}
+
 	public String getBelongGroupId() {
 		return belongGroupId;
 	}
+	
+	public String getUserImg() {
+		return userImg;
+	}
+
+	public void setUserImg(String userImg) {
+		this.userImg = userImg;
+	}
+
 	public void setBelongGroupId(String belongGroupId) {
 		this.belongGroupId = belongGroupId;
 	}

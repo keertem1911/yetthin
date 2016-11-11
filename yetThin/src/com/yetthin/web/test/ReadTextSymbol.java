@@ -5,17 +5,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.sym;
-import com.yetthin.web.commit.JtdoaUtil;
 
 import util.Contract;
-import util.JHdboa;
-import util.JTdoa;
 
 public class ReadTextSymbol {
 	

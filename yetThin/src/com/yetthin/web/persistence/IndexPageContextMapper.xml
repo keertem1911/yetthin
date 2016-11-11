@@ -13,15 +13,28 @@
     <result column="matchItems" property="matchitems" jdbcType="VARCHAR" />
     <result column="sId" property="sid" jdbcType="INTEGER" />
   </resultMap>
+   
   <sql id="Base_Column_List" >
     id, dateTime, open, height, low, close, ystClose, volume, matchItems, sId
   </sql>
+   <!--  <select  id="getStockBySearchLike" parameterType="java.util.Map" resultType="com.yetthin.web.domain.StockInfo">
+  	SELECT   stocklable_code as stockCode,stocklable_name as stockName from tb_stocklable where stocklable_code like '%#{stockCode,jdbc=VARCHAR}%' limit #{num,jdbcType=INTEGER}
+  </select> -->
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.util.Map" >
     select 
     <include refid="Base_Column_List" />
     from bardata
     where sid  = #{id} and dateTime >= #{time}
     order by dateTime ASC limit #{size} 
+  </select>
+  <resultMap id="stockinfo" type="com.yetthin.web.domain.StockInfo" >
+  	<result column="stocklable_code" property="stockCode"/>
+  	<result column="stocklable_name" property="stockName"/>
+  </resultMap>
+  <select id="getStockBySearchLike" parameterType="java.util.Map" resultMap="stockinfo">
+  	select stocklable_code  , stocklable_name   from tb_stocklable 
+  	where stocklable_code like #{stockCode,jdbcType=VARCHAR} limit #{num,jdbcType=INTEGER}
+  
   </select>
   <select id="getBetweenBeginAndEnd" parameterType="java.util.Map" resultMap="BaseResultMap">
   select 
@@ -163,4 +176,6 @@
       sId = #{sid,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+
 </mapper>

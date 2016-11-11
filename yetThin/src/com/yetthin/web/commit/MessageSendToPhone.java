@@ -45,10 +45,10 @@ public class MessageSendToPhone {
 					String json ="{\"alibaba_aliqin_fc_sms_num_send_response\":{\"result\":{\"err_code\":\"0\",\"model\":\"134523^4351232\",\"success\":false,\"msg\":\"成功\"}}}";
 //					String json=resp.getBody();
 					Class clazz=HashMap.class;
-					Map map=JSON.parseObject(json,clazz);
+					Map map=(Map) JSON.parseObject(json,clazz);
 					Object o=map.get("alibaba_aliqin_fc_sms_num_send_response");
 					if(o!=null){
-					map= JSON.parseObject(o.toString(),clazz);
+					map= (Map) JSON.parseObject(o.toString(),clazz);
 //					String request_id=map.get("request_id").toString();
 					Map<String, Object> result=JSON.parseObject(map.get("result").toString());
 					boolean success=(boolean)result.get("success");
