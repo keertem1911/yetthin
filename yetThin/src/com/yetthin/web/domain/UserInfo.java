@@ -10,9 +10,10 @@ public class UserInfo {
 
     private Double myMoney;
 
-    private String email;
 
     private String password;
+    
+    private String email;
     //极光id
     private String jpushId;
     //极光开关
@@ -25,10 +26,10 @@ public class UserInfo {
  
     private String verifyEmail;
     
-     private String registerTime;
      
      private String emailStatus;
     
+     private String registerTime;
      
      
 	public String getEmailStatus() {

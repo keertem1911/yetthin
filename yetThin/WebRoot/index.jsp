@@ -29,6 +29,8 @@
  	<form action="${pageContext.request.contextPath }/user/register" method="post">
  	 	<label>register</label>
  	 	<input type="text" name="phoneNum" placeholder="电话号码"/>
+ 	 	<input type="text" name="userName" placeholder="用户名"/>
+ 	 	
  		<input type="password" name="password" placeholder="密码"/>
  		<!-- <input type="text" value="" name="verifyCode" placeholder="验证码"/>
  	 -->	
@@ -104,6 +106,25 @@
  		<input type="submit" value="submit"/>
  	</form>
  	<br/>
+ 		<form action="${pageContext.request.contextPath }/user/changeNameAndDepart" method="post">
+ 	 	<label>changeNameAndDepart</label>
+ 		<input name="userID" type="text" placeholder="用户ID"/>
+ 	 
+  		<input name="userName" type="text" placeholder="新用户名"/>
+  		<input name="userDepart" type="text" placeholder="部门机构"/>
+  		
+ 		<input name="_method" type="hidden" value="put" />
+ 		<input type="submit" value="submit"/>
+ 	</form>
+ 	<br/>
+ 		<form action="${pageContext.request.contextPath }/user/changeDepart" method="post">
+ 	 	<label>changeDepart</label>
+ 		<input name="userID" type="text" placeholder="用户ID"/>
+ 		<input name="userDepart" type="text" placeholder="新部门"/>
+ 		<input name="_method" type="hidden" value="put" />
+ 		<input type="submit" value="submit"/>
+ 	</form>
+ 	<br/>
  	<form action="${pageContext.request.contextPath }/help/checkNewVersion" method="get">
  	 	<label>checkNewVersion</label>
  		<input type="submit" value="submit"/>
@@ -117,17 +138,27 @@
  		<input type="submit" value="submit"/>
  	</form>
   
- 		<form action="${pageContext.request.contextPath }/user/uploadPicture" method="POST" enctype="multipart/form-data">
+ 		<%-- <form action="${pageContext.request.contextPath }/user/uploadPicture" method="POST"
+ 		 enctype="multipart/form-data">
 		File: <input type="file" name="file"/>
-		Desc: <input type="text" name="userID"/>
+		Desc: <input type="text" name="userId"/>
 		<input type="submit" value="Submit"/>
-	</form> <br/>
+	</form> <br/> --%>
 	
 		<form action="${pageContext.request.contextPath }/user/changePhone" method="POST" >
 		<label>changePhone</label>
 		 <input type="text" name="newPhoneNum" placeholder="新手机号"/>
 		<input type="text" name="userID" placeholder="用户ID"/>
 			<input type="password" name="password" placeholder="密码"/>
+		<input type="submit" value="Submit"/>
+	</form>
+	<br/>
+		<form action="${pageContext.request.contextPath }/user/uploadPicture" method="POST" 
+	 enctype="multipart/form-data"	>
+		<label>上传头像</label>
+		 <input type="text" name="userId" placeholder="用户Id"/>
+		<input type="file" name="file" placeholder="上传头像"/>
+			 
 		<input type="submit" value="Submit"/>
 	</form>
 	<br/>
@@ -193,7 +224,8 @@
  		
  			<label>请求组合名称或者组合ID</label>
  			<input type="text" name="groupNameOrId"/><br/>
- 			 
+ 			<label><font color="red">查看详情的用户id</font> </label><br/>
+ 			<!-- <input  type="text" name="userId"/><br/> -->
  			 <input type="submit" value="提交"/>
  	</form>
  	<br/>
@@ -240,8 +272,10 @@
  			<input type="text" name="pageSize"/>
  			 <input type="submit" value="提交"/>
  	</form>
-  	<a href="Jdtoa.jsp">查看行情接口</a>
-  	<a href="group.jsp">组合接口</a>
+  	<a href="Jdtoa.jsp">查看行情接口</a><br/>
+  	<a href="group.jsp">组合接口</a><br/>
+  	<a href="shareInfo.jsp">仓位接口</a><br/>
+  	
   </div>
 </body>
 </html>

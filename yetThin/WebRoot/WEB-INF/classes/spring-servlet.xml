@@ -16,11 +16,11 @@
 	</bean>
 	<!-- 文件上传下载 -->
 	<!-- 配置 MultipartResolver -->
-	<!-- <bean id="multipartResolver"
+	 <!-- <bean id="multipartResolver"
 		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 		<property name="defaultEncoding" value="UTF-8"></property>
 		<property name="maxUploadSize" value="1024000"></property>	
-	</bean>	 -->
+	</bean>	   -->
 	 
 	<mvc:annotation-driven/>
 
@@ -50,6 +50,7 @@
 	<mvc:resources location="/css/" mapping="/css/**" />
 	<mvc:resources location="/" mapping="/*.jsp" />
 	<mvc:resources location="/excl/" mapping="/excl/**" />
+	<mvc:resources location="/version/" mapping="/version/**" />
 
 	
 </beans>

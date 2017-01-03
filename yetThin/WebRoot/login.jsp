@@ -132,10 +132,10 @@ position:absolute;
 			 
 			<button type="submit" class="btn btn-default ">Submit</button> 
 				<!-- Button trigger modal -->
-			  	<button type="button" class="btn btn-primary btn-lg" data-whatever="@mdo" data-toggle="modal"
+			  	<!-- <button type="button" class="btn btn-primary btn-lg" data-whatever="@mdo" data-toggle="modal"
 				 data-target="#myModal">
  					 Register
-				</button>  	
+				</button>   -->	
 		</form>
 </div>
 	</div>

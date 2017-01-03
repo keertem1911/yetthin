@@ -20,43 +20,18 @@ body { padding-top: 70px;
 .formdiv{
 	margin-top: 60px;
 }
+h1{
+		font-size: xx-large;
+		text-align:center;
+		
+	}
 </style>
 <title>admin home</title>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath }/js/jquery-3.1.0.min.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath }/js/bootstrap.js"></script>
-	<script type="text/javascript">
-		$(function(){
-			var url =window.location.href;
-			  url=url.substr(0, url.lastIndexOf("/"));
-			  url=url.substr(0, url.lastIndexOf("/")+1);
-		 
-			  $(".formdiv").load(url+"pageRequest/indexhref");
-			$("a").click(function(){
-				var className=$(this).attr("class");
-
-				if(className!="dropdown-toggle"&&className!="logout"){
-					var pref="pageRequest/";
-					if(className=="showUserinfo"||className=="lookfeedback"
-					||className=="selectInfo"||className=="selectAllAdmin"){
-						console.log("s");
-						pref="admin/";	
-					}
-					
-					$(".formdiv").load(url+pref+className);
-					
-				}
-			});
-			
-			  
-			//bootstrap的插件都需要激活。
-			//加一行代码在JS里应该就可以了
-			$('.dropdown-toggle').dropdown()
-			
-			 
-		})
-	</script>
+	 
 </head>
 <body>
 <nav class="navbar navbar-inverse   navbar-fixed-top ">
@@ -77,19 +52,16 @@ body { padding-top: 70px;
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1 ">
       <ul class="nav navbar-nav">
-        <li ><a href="#" class="indexhref">首页<span class="sr-only">(current)</span></a></li>
+        <li ><a href="${pageContext.request.contextPath }/pageRequest/home" class="indexhref">首页<span class="sr-only">(current)</span></a></li>
        <!--  <li><a href="#">Link2</a></li>
        -->  
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
            aria-expanded="false">客户端用户管理 <span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0);" class="showUserinfo"  >查看全部用户信息</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/showUserinfo"   >查看全部用户信息</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="selectByphoneNum">通过电话号查看用户信息</a></li>
-            <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="selectByEmail">通过邮箱号查看用户信息</a></li>
-            
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectByphoneNum" >通过电话号查看用户信息</a></li> 
           </ul>
         </li>
       </ul>
@@ -105,13 +77,13 @@ body { padding-top: 70px;
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
           aria-haspopup="true" aria-expanded="false">后台管理<span class="caret"></span></a>
           <ul class="dropdown-menu">
-           <li><a href="javascript:void(0);" class="showRiskMinitor">风控监控</a></li>
+           <li><a href="${pageContext.request.contextPath }/pageRequest/showRiskMinitor" >风控监控</a></li>
          
-            <li><a href="javascript:void(0);" class="updateNewVersion">上传Andriod新版本</a></li>
-            <li><a href="javascript:void(0);" class="updateHeadPicture">上传头部图片</a></li>
-            <li><a href="javascript:void(0);" class="updateInterface">上传接口文档</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateNewVersion">上传Andriod新版本</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateHeadPicture" >上传头部图片</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateInterface">上传接口文档</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="lookfeedback">查看反馈</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/lookfeedback">查看反馈</a></li>
              
           </ul>
         </li>
@@ -119,13 +91,13 @@ body { padding-top: 70px;
           <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
           aria-haspopup="true" aria-expanded="false">个人信息管理<span class="caret"></span></a>
           <ul class="dropdown-menu">
-            <li><a href="javascript:void(0);" class="changePwd">更改密码</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/changePwd" >更改密码</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="changeUsername">更改用户名</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/changeUsername">更改用户名</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="selectInfo">查询信息</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectInfo">查询信息</a></li>
             <li role="separator" class="divider"></li>
-            <li><a href="javascript:void(0);" class="selectAllAdmin">查询所有管理员</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectAllAdmin">查询所有管理员</a></li>
           </ul>
         </li>
        <!--  <li class="dropdown">
@@ -149,7 +121,7 @@ body { padding-top: 70px;
 </nav>
 	<div class="container-fluid maindiv">
 	<div class="container formdiv">
-			 
+			<h1>欢迎来到后台管理中心</h1> 
  	</div>
 </body>
 </html>

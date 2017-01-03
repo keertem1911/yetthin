@@ -2,7 +2,7 @@ package com.yetthin.web.domain;
 
 public class PhoneVersion {
     // id
-	private Integer id;
+	private String id;
     //版本号
     private String versionCode;
     //版本名称
@@ -11,16 +11,18 @@ public class PhoneVersion {
     private String apkUrl;
     // 说明
     private String explain;
+    
+    
 
-    public Integer getId() {
-        return id;
-    }
+    public String getId() {
+		return id;
+	}
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getVersionCode() {
+	public String getVersionCode() {
         return versionCode;
     }
 

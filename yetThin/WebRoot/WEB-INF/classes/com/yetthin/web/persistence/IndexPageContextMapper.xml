@@ -13,7 +13,15 @@
     <result column="matchItems" property="matchitems" jdbcType="VARCHAR" />
     <result column="sId" property="sid" jdbcType="INTEGER" />
   </resultMap>
-   
+     <resultMap id="stockLable" type="com.yetthin.web.domain.StockLable" >
+    <id column="stocklable_id" property="stocklableId" jdbcType="VARCHAR" />
+    <result column="stocklable_code" property="stocklableCode" jdbcType="VARCHAR" />
+    <result column="stocklable_name" property="stocklableName" jdbcType="VARCHAR" />
+    <result column="stocklable_type" property="stocklableType" jdbcType="VARCHAR" />
+    <result column="stocklable_market" property="stocklableMarket" jdbcType="VARCHAR" />
+    <result column="stocklable_trade" property="stocklableTrade" jdbcType="VARCHAR" />
+    <result column="stocklable_status" property="stocklableStatus" jdbcType="VARCHAR" />
+  </resultMap>
   <sql id="Base_Column_List" >
     id, dateTime, open, height, low, close, ystClose, volume, matchItems, sId
   </sql>
@@ -35,6 +43,42 @@
   	select stocklable_code  , stocklable_name   from tb_stocklable 
   	where stocklable_code like #{stockCode,jdbcType=VARCHAR} limit #{num,jdbcType=INTEGER}
   
+  </select>
+  <sql id="stock_sql" >stocklable_code,stocklable_name,stocklable_type,stocklable_market
+  ,stocklable_trade,stocklable_status,stocklable_id</sql>
+  <select id="getStockByStrategy" resultMap="stockLable" parameterType="com.yetthin.web.domain.GroupStockByStratgyLable">
+  	select <include refid="stock_sql"></include> 
+  	from tb_stocklable 
+  	<where> 
+  	<if test="industry !=null ">
+  		  stocklable_trade in 
+  		<foreach collection="industry" item="item" close=")" open="("
+  		separator="," index="index">
+  		#{item,jdbcType=VARCHAR}
+  		</foreach>
+  		<!-- <if test="industryIndex1 !=null">
+  		'${item}'
+  		 and   stocklable_market =  ${industryIndex1}
+
+		</if> -->
+		<if test="stockMarket !=null ">
+		and 	stocklable_market in 
+		<foreach collection="stockMarket" open="(" close=")" separator="," item="item" >
+			#{item,jdbcType=VARCHAR}
+		</foreach>
+		</if>
+	  
+	</if>
+  	<if test="markets !=null  ">
+  	or 	stocklable_market in 
+  		<foreach collection="markets" item="item" close=")" open="("
+  		separator="," index="index">
+		  	${item,jdbcType=VARCHAR}
+ 		</foreach> 
+  	</if>
+  	
+  	</where>
+  	order by stocklable_code
   </select>
   <select id="getBetweenBeginAndEnd" parameterType="java.util.Map" resultMap="BaseResultMap">
   select 

@@ -22,7 +22,7 @@
 $(function(){
 	
 		$("#form").submit(function(){
-			var ext= "jpg";
+			var ext= "png";
 			var f=$("#picture").val();
 			if(f==""){
 				alert("请上传图片");
@@ -63,14 +63,93 @@ $(function(){
 })
 </script>
 <body>
+<nav class="navbar navbar-inverse   navbar-fixed-top ">
+  <div class="container-fluid">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <!-- 商标 图片 -->
+      <a class="navbar-brand" href="#">
+      	<img alt="Brand" src=""/></a>
+    </div>
 
-<%-- <form action="${pageContext.request.contextPath }/picture/upload" method="post" enctype="multipart/form-data">
- 		图片顺序<input type="text" name="partNum"/>
- 		图片点击链接<input type="text" name="href"/>
- 		上传图片<input type="file" name="picture"/>
- 		<input type="submit" value="save"/>
- 	</form> --%>
-<form id="form" action="${pageContext.request.contextPath }/picture/upload" method="post" enctype="multipart/form-data">
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1 ">
+      <ul class="nav navbar-nav">
+        <li ><a href="${pageContext.request.contextPath }/pageRequest/home" class="indexhref">首页<span class="sr-only">(current)</span></a></li>
+       <!--  <li><a href="#">Link2</a></li>
+       -->  
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+           aria-expanded="false">客户端用户管理 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="${pageContext.request.contextPath }/pageRequest/showUserinfo"   >查看全部用户信息</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectByphoneNum" >通过电话号查看用户信息</a></li>
+          </ul>
+        </li>
+      </ul>
+    <!--   <form class="navbar-form navbar-left" role="search">
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Search">
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form> -->
+      <ul class="nav navbar-nav navbar-left">
+        
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+          aria-haspopup="true" aria-expanded="false">后台管理<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+           <li><a href="${pageContext.request.contextPath }/pageRequest/showRiskMinitor" >风控监控</a></li>
+         
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateNewVersion">上传Andriod新版本</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateHeadPicture" >上传头部图片</a></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/updateInterface">上传接口文档</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/lookfeedback">查看反馈</a></li>
+             
+          </ul>
+        </li>
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+          aria-haspopup="true" aria-expanded="false">个人信息管理<span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="${pageContext.request.contextPath }/pageRequest/changePwd" >更改密码</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/changeUsername">更改用户名</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectInfo">查询信息</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="${pageContext.request.contextPath }/pageRequest/selectAllAdmin">查询所有管理员</a></li>
+          </ul>
+        </li>
+       <!--  <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" 
+          aria-haspopup="true" aria-expanded="false">Dropdown4 <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li><a href="#">Action4</a></li>
+            <li><a href="#">Another action</a></li>
+            <li><a href="#">Something else here</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Separated link</a></li>
+          </ul>
+        </li> -->
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+      	<li><a href="javascript:void(0);"><span class="label label-info">管理员</span></a></li>
+      	<li><a href="${pageContext.request.contextPath }/admin/logout" class="logout"><span class="label label-danger">退出登录</span></a></li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+</nav>
+<div class="container formdiv" style=" margin-top:70px">
+	<form id="form" action="${pageContext.request.contextPath }/picture/upload" method="post" enctype="multipart/form-data">
   <div class="form-group">
     <label for="exampleInputEmail1">轮播图次序</label>
     	<input  type="text" class="form-control" name="partNum" id="partNum"/>
@@ -91,5 +170,13 @@ $(function(){
   <button type="submit" class="btn btn-default" >Submit</button>
 </form>
   <a href="${pageContext.request.contextPath }/pageRequest/showpicture" >查看上传结果</a>
+</div>
+<%-- <form action="${pageContext.request.contextPath }/picture/upload" method="post" enctype="multipart/form-data">
+ 		图片顺序<input type="text" name="partNum"/>
+ 		图片点击链接<input type="text" name="href"/>
+ 		上传图片<input type="file" name="picture"/>
+ 		<input type="submit" value="save"/>
+ 	</form> --%>
+
 </body>
 </html>

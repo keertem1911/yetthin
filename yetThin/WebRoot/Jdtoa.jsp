@@ -217,9 +217,7 @@
 						 shenzhenFun();
 					
 				}); */
-				$('body').everyTime('6s',function(){
-					 shenzhenFun();
-				 });
+				 
 				 
 			})
 	</script>
@@ -244,6 +242,7 @@
 		 	<option value="0:0,1,2" selected="selected">沪深:涨幅,跌幅,换手率(0:0,1,2)</option>
 		 </select>
 		<input type="button" value="get" id="shenzhen-sub"/>
+		<input type="submit" value="get"/>
 	</form><br/>
 	<form action="${pageContext.request.contextPath }/jtdoa/getLevel2" method="post" id="getLevel2">
 		<label>摆单接口 </label>
@@ -323,6 +322,30 @@
 		
 		<input type="submit" value="submits"/>
 		</form>
+		<br/>
+		
+ 		<label><font color="red">获取指数 的成分股排名</font></label>
+ 	<form action="${pageContext.request.contextPath }/jtdoa/getStockIndexChild"
+ 	method="post" 
+ 	>
+ 		
+ 		<label>指数编码</label>
+		<select name="stockIndex">
+			<option value="0-0">0-0上证综指</option>
+			<option value="0-1">0-1深证综指</option>
+			<option value="0-2">0-2创业板指数</option>
+		</select>
+		<input type="text"   placeholder="起始下标  0 开始" name="begin"/>
+		<input type="text"   placeholder="结束下标" name="end"/>
+		<label>是否详情</label>
+		<select name="master">
+				<option value="false">false</option>
+				<option value="true">true</option>
+		</select>		
+		<input type="submit" value="submits"/>
+		</form>
+		<br/>
+		
 	</div>
 	<div class="display">
 		<div class="level1"></div>

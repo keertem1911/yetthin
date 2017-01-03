@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.ConceptMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.Concept" >
+    <id column="concept_id" property="conceptId" jdbcType="VARCHAR" />
+    <result column="concept_name" property="conceptName" jdbcType="VARCHAR" />
+    <result column="concept_create_time" property="conceptCreateTime" jdbcType="VARCHAR" />
+    <result column="concept_heat_level" property="conceptHeatLevel" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    concept_id, concept_name, concept_create_time, concept_heat_level
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_concept
+    where concept_id = #{conceptId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKeyFromAll" resultMap="BaseResultMap"  >
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_concept
+    order by concept_heat_level
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_concept
+    where concept_id = #{conceptId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.Concept" >
+    <selectKey resultType="java.lang.String" keyProperty="conceptId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_concept (concept_id, concept_name, concept_create_time, 
+      concept_heat_level)
+    values (#{conceptId,jdbcType=VARCHAR}, #{conceptName,jdbcType=VARCHAR}, #{conceptCreateTime,jdbcType=VARCHAR}, 
+      #{conceptHeatLevel,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.Concept" >
+    <selectKey resultType="java.lang.String" keyProperty="conceptId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_concept
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      concept_id,
+      <if test="conceptName != null" >
+        concept_name,
+      </if>
+      <if test="conceptCreateTime != null" >
+        concept_create_time,
+      </if>
+      <if test="conceptHeatLevel != null" >
+        concept_heat_level,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{conceptId,jdbcType=VARCHAR},
+      <if test="conceptName != null" >
+        #{conceptName,jdbcType=VARCHAR},
+      </if>
+      <if test="conceptCreateTime != null" >
+        #{conceptCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="conceptHeatLevel != null" >
+        #{conceptHeatLevel,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.Concept" >
+    update tb_concept
+    <set >
+      <if test="conceptName != null" >
+        concept_name = #{conceptName,jdbcType=VARCHAR},
+      </if>
+      <if test="conceptCreateTime != null" >
+        concept_create_time = #{conceptCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="conceptHeatLevel != null" >
+        concept_heat_level = #{conceptHeatLevel,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where concept_id = #{conceptId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.Concept" >
+    update tb_concept
+    set concept_name = #{conceptName,jdbcType=VARCHAR},
+      concept_create_time = #{conceptCreateTime,jdbcType=VARCHAR},
+      concept_heat_level = #{conceptHeatLevel,jdbcType=DOUBLE}
+    where concept_id = #{conceptId,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -2,9 +2,7 @@ package com.yetthin.web.serviceImp;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,17 +10,19 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.httpclient.methods.PutMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.yetthin.web.commit.JtdoaValueMarket;
 import com.yetthin.web.commit.ValueFormatUtil;
 import com.yetthin.web.dao.JtdoaAPIDao;
 import com.yetthin.web.dao.JtdoaDao;
+import com.yetthin.web.domain.StockWithPriceAndRadio;
 import com.yetthin.web.domain.barData;
 import com.yetthin.web.service.JtdoaService;
 
+import redis.clients.jedis.Jedis;
 import util.BarData;
 import util.TickSort;
 
@@ -65,7 +65,8 @@ public class JtdoaServiceImp implements JtdoaValueMarket,ValueFormatUtil,JtdoaSe
 			String [] subStr=index[i].split(JTDOA_SPLIT_STR);
 			sb.append("{\"name\":\"" +subStr[1]+"\","+ 
 		            "\"price\":\""+subStr[2]+"\","+
-		            "\"stockID\":\""+subStr[0]+"\",");
+		            "\"stockID\":\""+subStr[0]+"\","
+		            		+ "\"stockIndex\":\"0-"+i+"\",");
 			boolean plus=true;
 			 
 			if(subStr[4].indexOf("-")!=-1){
@@ -290,7 +291,7 @@ public class JtdoaServiceImp implements JtdoaValueMarket,ValueFormatUtil,JtdoaSe
 			}else{
 				subStr[1]="{}";
 			}
-		 	Map<String,List<String>> marketS =jtdoaDao.getL1StockMarketData(HU_SHEN,begin,end,params,master);
+		 	Map<String,List<String>> marketS =jtdoaDao.getL1StockMarketData(HU_SHEN,begin,end,params);
 			subStr[2]=putStockMarketData(marketS,master);
 			if((subStr[1].equals("")||subStr[1]==null)&&(subStr[2].equals("")||subStr[2]==null)){
 				subStr[0]="520";//
@@ -653,14 +654,14 @@ public class JtdoaServiceImp implements JtdoaValueMarket,ValueFormatUtil,JtdoaSe
 	 * 获取行业指数集合
 	 * @return  0 stateCode 1 item 2 msg
 	 */
-	@Override
-	public String[] getStockIndustry(String beginIndex, String endIndex,String time,String size) {
-		// TODO Auto-generated method stub
-		List<barData> barList=jtdoaDao.getStockIndex(beginIndex,endIndex,time,size);
-		
-		System.out.println(Arrays.asList(barList));
-		return null;
-	}
+//	@Override
+//	public String[] getStockIndustry(String beginIndex, String endIndex,String time,String size) {
+//		// TODO Auto-generated method stub
+//		List<barData> barList=jtdoaDao.getStockIndex(beginIndex,endIndex,time,size);
+//		
+//		System.out.println(Arrays.asList(barList));
+//		return null;
+//	}
 	/**
 	 * K线 json 格式转换
 	 * {data:[{date:'',open:'',low:'',height:'',close:''},
@@ -686,28 +687,35 @@ public class JtdoaServiceImp implements JtdoaValueMarket,ValueFormatUtil,JtdoaSe
 		
 		return sb.toString(); 
 	}
+//	@Override
+//	public String[] getStockIndustryDK(String id, String time, String size) {
+//		// TODO Auto-generated method stub
+//		Map<String,Object> map= new HashMap<>();
+//		map.put("id", Integer.parseInt(id));
+//		map.put("time", time);
+//		map.put("size",Integer.parseInt(size));
+//		List<barData> list =jtdoaDao.getStockIndustryDK(map);
+//		System.out.println(Arrays.asList(list));
+//		String str=KMdata2String(list);
+//		String [] s=new String[3];
+//		if(str!=null&&!"".equals(str.trim())){
+//			s[2]=str;
+//			s[0]="200";
+//			s[1]="\"\"";
+//		}else{
+//			s[2]="\"\"";
+//			s[0]="420";
+//			s[1]="日K线错误";
+//			
+//		}
+//		return s;
+//	}
 	@Override
-	public String[] getStockIndustryDK(String id, String time, String size) {
+	public String  getStockIndexChild(String begin,String end, String stockIndex,boolean master) {
 		// TODO Auto-generated method stub
-		Map<String,Object> map= new HashMap<>();
-		map.put("id", Integer.parseInt(id));
-		map.put("time", time);
-		map.put("size",Integer.parseInt(size));
-		List<barData> list =jtdoaDao.getStockIndustryDK(map);
-		System.out.println(Arrays.asList(list));
-		String str=KMdata2String(list);
-		String [] s=new String[3];
-		if(str!=null&&!"".equals(str.trim())){
-			s[2]=str;
-			s[0]="200";
-			s[1]="\"\"";
-		}else{
-			s[2]="\"\"";
-			s[0]="420";
-			s[1]="日K线错误";
-			
-		}
-		return s;
+		String json=jtdoaAPIDao.
+				getStockIndexChild(stockIndex,Integer.parseInt(begin),Integer.parseInt(end),master);
+		return "{"+json+"}";
 	}
 }
 

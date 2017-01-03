@@ -6,8 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.servlet.http.Cookie;
@@ -27,11 +27,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import com.alibaba.fastjson.JSON;
-import com.yetthin.web.commit.MessageSendToPhone;
-import com.yetthin.web.domain.UserInfo;
- 
+import com.yetthin.web.domain.User;
 import com.yetthin.web.service.UserInfoService;
 
 @Controller
@@ -41,7 +41,7 @@ public class UserInfoController extends BaseController{
 
 	@Resource(name="UserInfoService")
 	private UserInfoService userInfoService;
-	 
+	
 	@ModelAttribute
 	public void setReqAndRes(HttpServletRequest request, HttpServletResponse response){  
         super.request = request;  
@@ -59,11 +59,14 @@ public class UserInfoController extends BaseController{
 	 * 注册
 	 * @param userInfo
 	 * @param pw
+	 * @keerte
 	 */
 	@ResponseBody
 	@RequestMapping(value="/register",method=RequestMethod.POST,
 			produces = {"application/json;charset=UTF-8"})
-	public String Rigister(@RequestParam("phoneNum")String phoneNum,@RequestParam("password")String password){
+	public String Rigister(@RequestParam("phoneNum")String phoneNum,
+			@RequestParam("userName")String userName,
+			@RequestParam("password")String password){
 		
 		String msg=null;
 		String statusCode="200";
@@ -71,10 +74,10 @@ public class UserInfoController extends BaseController{
 			password =password.trim();
 			phoneNum=phoneNum.trim();
 			 
-			List<UserInfo> lists=userInfoService.getListAll();
+			List<User> lists=userInfoService.getListAll();
 			boolean same=false;
-			for(UserInfo u:lists){
-				if(u.getPhoneNum().equals(phoneNum)){
+			for(User u:lists){
+				if(u.getUserPhone().equals(phoneNum)){
 					same=true;
 					break;
 				}
@@ -83,11 +86,11 @@ public class UserInfoController extends BaseController{
 			if(!same){
 			 	  	password= getEncrty(phoneNum+","+password);
 						
-						UserInfo user=new UserInfo();
-						user.setPassword(password);
-						user.setPhoneNum(phoneNum);
-						String s =UUID.randomUUID().toString();
-						s=s.substring(0,8)+s.substring(9,13)+s.substring(14,18)+s.substring(19,23)+s.substring(24);
+						User user=new User();
+						user.setUserPassword(password);
+						user.setUserPhone(phoneNum);
+						user.setUserName(userName);
+						String s=getUUID();
 						user.setUserId(s);
 						try {
 							int flag=userInfoService.save(user);
@@ -99,23 +102,14 @@ public class UserInfoController extends BaseController{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
-					 
-				 
-				
 			}else{ //same if 
 				msg="电话号码已注册";
 				statusCode="502";
 			}
-			
-			
-			
 		}else{// not empty 
 			statusCode="503";
 			msg="用户名或密码不能为空";
 		}
-		
-		
 		if(msg==null||"null".equals(msg))
 			msg="\'\'";
 		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
@@ -126,29 +120,30 @@ public class UserInfoController extends BaseController{
 	 * @param phone
 	 * @param pw
 	 */
-	@ResponseBody
-	@RequestMapping(value="/getRegisterVerify",method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
-	public String getRegisterVerify(@RequestParam(value="phoneNum",required=true)String phone){
-		System.out.println(" getRegisterVerify session    "+request.getSession().getId()+" =================="); 
-		System.out.println("come into getRegisterVerify $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-		String msg ="";
-		String statusCode="200";
-		if(!"".equals(phone.trim())){
-			
-		 }else{
-			msg="电话输入为空";
-			statusCode="503";
-		}
-		if(msg==null||"null".equals(msg))
-			msg="\'\'";
-		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
-		
-	}
+//	@ResponseBody
+//	@RequestMapping(value="/getRegisterVerify",method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
+//	public String getRegisterVerify(@RequestParam(value="phoneNum",required=true)String phone){
+//		System.out.println(" getRegisterVerify session    "+request.getSession().getId()+" =================="); 
+//		System.out.println("come into getRegisterVerify $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//		String msg ="";
+//		String statusCode="200";
+//		if(!"".equals(phone.trim())){
+//			
+//		 }else{
+//			msg="电话输入为空";
+//			statusCode="503";
+//		}
+//		if(msg==null||"null".equals(msg))
+//			msg="\'\'";
+//		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
+//		
+//	}
 	/**
 	 * 登陆
 	 * @param phone
 	 * @param password
 	 * @return
+	 * @keerte
 	 */
 	@ResponseBody
 	@RequestMapping(value="/login",method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
@@ -156,28 +151,30 @@ public class UserInfoController extends BaseController{
 			@RequestParam("password")String password,Model model){
 		System.out.println("login session    "+request.getSession().getId()+" =================="); 
 		phone=phone.trim();
+		logger.info(phone+" login");
 		password=password.trim();
 		System.out.println("come into login $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		password=getEncrty(phone+","+password);
 		
-		UserInfo u = userInfoService.selectByPhoneNum(phone);
+		User u = userInfoService.selectByPhoneNum(phone);
 		String item="\"\"";
 		String msg="";
 		String statusCode="200";
 		if(u==null){
 			msg="用户不存在";
 			statusCode="504";
-		}else{ if(u.getPassword().trim().equals(password.trim())){
-			String auth_id=phone+"="+getEncrty(u.getPhoneNum());
+		}else{ if(u.getUserPassword().trim().equals(password.trim())){
+			String auth_id=phone+"="+getEncrty(u.getUserPhone());
 			model.addAttribute("auth_id", auth_id);
 			 
-			u.setPassword("");
-			u.setIdeaText("");
+			u.setUserPassword("");
+			 
 			item=JSON.toJSONString(u);
 			HttpSession session = request.getSession();
-			String sessionId=session.getId();
-			Cookie cookie=new Cookie("JSESSION", sessionId);
-			response.addCookie(cookie);
+//			String sessionId=session.getId();
+//			Cookie cookie=new Cookie("JSESSION", sessionId);
+			session.setAttribute("userId", u.getUserId());
+//			response.addCookie(cookie);
 		}else{
 			msg="密码错误";
 			statusCode="505";
@@ -195,6 +192,7 @@ public class UserInfoController extends BaseController{
 	 * @param verifyCode 验证码
 	 * @param password
 	 * @return 状态码
+	 * @keerte
 	 */
 	@ResponseBody
 	@RequestMapping(value="/forgetPwd",method=RequestMethod.POST,
@@ -210,10 +208,10 @@ public class UserInfoController extends BaseController{
 		 
 		 
 			 	 
-				UserInfo userinfo = userInfoService.selectByPhoneNum(phoneNum);
+		 		User userinfo = userInfoService.selectByPhoneNum(phoneNum);
 				if(userinfo!=null){
 					password=getEncrty(phoneNum+","+password);
-					userinfo.setPassword(password);
+					userinfo.setUserPassword(password);
 					try {
 						String i=userInfoService.forgetPwd(userinfo);
 						statusCode=i.split(",")[0];
@@ -242,29 +240,30 @@ public class UserInfoController extends BaseController{
 	 * 忘记密码的验证码
 	 * @param phoneNum
 	 * @return
+	 * 
 	 */
-	@ResponseBody
-	@RequestMapping(value="/getforgetPwdVerify",method=RequestMethod.PUT,
-			produces = {"application/json;charset=UTF-8"})
-	public String getForgetPwdVerify(@RequestParam(value="phoneNum",required=true)String phoneNum){
-		String statusCode="200";
-		System.out.println("getForgetPwdVerify session    "+request.getSession().getId()+" =================="); 
-		String msg=null;
-		System.out.println("come into getForgetPwdVerify $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-		System.out.println("phoneNum="+phoneNum);
-		 
-		if(!"".equals(phoneNum.trim())){
-		String verifyCode="";
-		String results =MessageSendToPhone.sendToRigister(phoneNum,"SMS_10140393","投智星app");
-	 
-		}else{
-			msg="电话输入为空";
-			statusCode="503";
-		}
-		if(msg==null||"null".equals(msg))
-			msg="\'\'";
-			return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
-	}
+//	@ResponseBody
+//	@RequestMapping(value="/getforgetPwdVerify",method=RequestMethod.PUT,
+//			produces = {"application/json;charset=UTF-8"})
+//	public String getForgetPwdVerify(@RequestParam(value="phoneNum",required=true)String phoneNum){
+//		String statusCode="200";
+//		System.out.println("getForgetPwdVerify session    "+request.getSession().getId()+" =================="); 
+//		String msg=null;
+//		System.out.println("come into getForgetPwdVerify $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//		System.out.println("phoneNum="+phoneNum);
+//		 
+//		if(!"".equals(phoneNum.trim())){
+//		String verifyCode="";
+//		String results =MessageSendToPhone.sendToRigister(phoneNum,"SMS_10140393","投智星app");
+//	 
+//		}else{
+//			msg="电话输入为空";
+//			statusCode="503";
+//		}
+//		if(msg==null||"null".equals(msg))
+//			msg="\'\'";
+//			return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
+//	}
 	
 	 
 	/**
@@ -372,10 +371,13 @@ public class UserInfoController extends BaseController{
 	 * @param userId
 	 * @param email
 	 * @return
+	 * @keerte
 	 */
 	@ResponseBody
 	@RequestMapping(value="/bindingEmail",method=RequestMethod.PUT,produces = {"application/json;charset=UTF-8"})
-	public String bindingEmail(@RequestParam(value="userID")String userId,@RequestParam(value="email")String email){
+	public String bindingEmail(@RequestParam(value="userID")String userId,
+			@RequestParam(value="email")String email,
+			HttpServletRequest request){
 		String statusCode="200";
 		String msg="";
 		userId=userId.trim();
@@ -383,7 +385,7 @@ public class UserInfoController extends BaseController{
 		if(checkEmail(email)){
 		System.out.println("come into updateJpushStatus bindingEmail $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 		System.out.println("userID="+userId+",email="+email);
-		String flag=userInfoService.bindingEmail(userId, email);
+		String flag=userInfoService.bindingEmail(userId, email,request.getRequestURL().toString());
 		String [] subStr=flag.split("=");
 		if(subStr[1]!=null){
 			msg=subStr[1];
@@ -403,6 +405,7 @@ public class UserInfoController extends BaseController{
 	 * @param oldPassword
 	 * @param newPassword
 	 * @return
+	 * @keerte
 	 */
 	@ResponseBody
 	@RequestMapping(value="/changePwd",method=RequestMethod.PUT,produces = {"application/json;charset=UTF-8"})
@@ -416,16 +419,16 @@ public class UserInfoController extends BaseController{
 		userId =userId.trim();
 		oldPassword=oldPassword.trim();
 		newPassword=newPassword.trim();
-		UserInfo u=userInfoService.get(userId);
+		User u=userInfoService.get(userId);
 		if(u==null){
 			msg="用户不存在";
 			statusCode="504";
 		}else{
 			System.out.println(u);
-			String oldP=getEncrty(u.getPhoneNum()+","+oldPassword);
-			if(u.getPassword().equals(oldP.trim())){
-			String newP=getEncrty(u.getPhoneNum()+","+newPassword);
-			u.setPassword(newP);
+			String oldP=getEncrty(u.getUserPhone()+","+oldPassword);
+			if(u.getUserPassword().equals(oldP.trim())){
+			String newP=getEncrty(u.getUserPhone()+","+newPassword);
+			u.setUserPassword(newP);
 			String flag=userInfoService.changePwd(u);
 			if(!flag.equals("200")){
 				msg=flag;
@@ -451,7 +454,60 @@ public class UserInfoController extends BaseController{
 			msg="\'\'";
 		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
 	}
+	@ResponseBody
+	@RequestMapping(value="/changeNameAndDepart",method=RequestMethod.PUT,
+	produces = {"application/json;charset=UTF-8"})
+	public String changeUserName(@RequestParam(value="userID")String userId,
+			@RequestParam(value="userName")String userName,
+			@RequestParam(value="userDepart")String userDepart){
+		System.out.println("come into  changePwd $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		 String json ="";
+		String statusCode;
+		String msg="";
+		if(!"".equals(userId)&&!"".equals(userName)&&!"".equals(userName)){
+		userId =userId.trim();
+	 
+		 
+		User u=userInfoService.get(userId);
+		if(u==null){
+			msg="用户不存在";
+			statusCode="504";
+		}else{
+			System.out.println(u);
+			 
+			u.setUserName(userName);
+			u.setUserFirm(userDepart);
+			String flag=userInfoService.changePwd(u);
+			if(flag.equals("200")){
+				statusCode=flag;
+				json =",\"userName\":\""+userName+"\",\"userDepart\":\""+userDepart+"\"";
+			}else if(!flag.equals("200")){
+				msg=flag;
+				statusCode="506";
+			}else{
+				statusCode="505";
+				msg="id错误";
+			}
+		 
+		}
+		 
+		}else{
+			statusCode="503";
+			if("".equals(userId)){
+			msg="id为空";
+			}else if("".equals(userName)){
+			msg="用户名为空";
+			}else{
+			msg="新为空";
+			}
+		}
+		if(msg==null||"null".equals(userName))
+			msg="\'\'";
+		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\""+json+"}";
+	}
 	
+	
+	 
 	/**
 	 * 意见反馈
 	 * @param userId
@@ -488,61 +544,152 @@ public class UserInfoController extends BaseController{
 	 * @param file
 	 * @param userId
 	 * @return
+	 * @keerte
 	 */
 	@ResponseBody 
-	@RequestMapping(value="/uploadPicture",produces = {"application/json;charset=UTF-8"})
-	public String updatePicture(@RequestParam("file")MultipartFile file,@RequestParam("userID")String userId){
-		
-	 
+	@RequestMapping(value="/uploadPicture",
+	method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
+	public String updatePicture(
+			HttpServletRequest request){
 		String msg="";	
 		String statusCode="200";
-		if(!"".equals(userId)&&file!=null){
-				String fileName=file.getOriginalFilename();
-				String format=fileName.substring(fileName.lastIndexOf("."));
-				 
-				userId=userId.trim();
-				UserInfo user = userInfoService.get(userId);
-				if(user!=null){
+		String userID = request.getParameter("userId");
+		String imgPath="";
+		HttpSession session = request.getSession();
+		System.out.println(session.getId());
+//		String userId  =(String)session.getAttribute("userId");
+//		if(!"".equals(userId)){
+			imgPath =request.getRequestURL().toString().split("/user")[0];
+			CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver(
+					request.getSession().getServletContext());
+			 
+			if (multipartResolver.isMultipart(request)) {
+				MultipartHttpServletRequest multiRequest = (MultipartHttpServletRequest) request;
+				Iterator<String> iter = multiRequest.getFileNames();
+				while (iter.hasNext()) {
+					MultipartFile fileer = multiRequest.getFile((String) iter.next());
+					 
+					if (fileer != null && fileer.getSize() > 0) {
+			String fileName=fileer.getOriginalFilename();
+			String format=fileName.substring(fileName.lastIndexOf("."));
+			
+//			userId=userId.trim();
+			User user = userInfoService.get(userID);
+			if(user!=null){
 				String path=request.getSession().getServletContext().getRealPath("/");
-				System.out.println(path);
-				String savepicture=path+"image";
-				File directory=new File(savepicture+"/user-"+userId+".jpg");
-				 
+				String lastName = fileName.split("[.]")[1];
+				System.out.println(lastName);
+				String pictureName ="user-"+getUUID()+"."+lastName;
+				imgPath =imgPath +"/image/"+pictureName;
+				user.setUserHeadPic(imgPath);
+				String savepicture=path+"image/";
+				File directory=new File(savepicture+pictureName);
+				try {
+					String  i =userInfoService.changePwd(user);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				if(directory.exists()==false){
 					directory.mkdirs();
 				}
 				try {
-					file.transferTo(directory);
-				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
+					fileer.transferTo(directory);
+				} catch (IllegalStateException | IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
+			}
+					}
+				}
 //				InputStream is=file.getInputStream();
 // 				OutputStream out=FileUtils.openOutputStream(new File(savepicture++"/"+user.));
-				}else{
-					msg="用户不存在";
-					statusCode="504";
-				}
-				
-		}else{
+//		}else{
+//				msg="用户不存在";
+//				statusCode="504";
+//				
+//			}
+					 
+	}else{
 			msg="输入不能为空";
 			statusCode="503";
 		}
-		if(msg==null||"null".equals(msg))
+	if(msg==null||"null".equals(msg))
 			msg="\'\'";
-		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
+	
+		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\",\"user_img\":\""+imgPath+"\"}";
+		
+			 
+		 
 	}
+//	/**
+//	 * 更新头像 
+//	 * @param file
+//	 * @param userId
+//	 * @return
+//	 * @keerte
+//	 */
+//	@ResponseBody 
+//	@RequestMapping(value="/uploadPicture",produces = {"application/json;charset=UTF-8"})
+//	public String updatePicture(@RequestParam("file")MultipartFile file,@RequestParam("userID")String userId,
+//			HttpServletRequest request){
+//		String msg="";	
+//		String statusCode="200";
+//		String imgPath="";
+//		if(!"".equals(userId)&&file!=null){
+//			imgPath =request.getRequestURL().toString().split("/user")[0];
+//			String fileName=file.getOriginalFilename();
+//			String format=fileName.substring(fileName.lastIndexOf("."));
+//			
+//			userId=userId.trim();
+//			User user = userInfoService.get(userId);
+//			if(user!=null){
+//				String path=request.getSession().getServletContext().getRealPath("/");
+//				String lastName = fileName.split("[.]")[1];
+//				System.out.println(lastName);
+//				user.setUserHeadPic("user-"+userId+"."+lastName);
+//				imgPath =imgPath +"/image/"+user.getUserHeadPic();
+//				String savepicture=path+"image/";
+//				File directory=new File(savepicture+user.getUserHeadPic());
+//				
+//				if(directory.exists()==false){
+//					directory.mkdirs();
+//				}
+//				try {
+//					file.transferTo(directory);
+//				} catch (IllegalStateException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+////				InputStream is=file.getInputStream();
+//// 				OutputStream out=FileUtils.openOutputStream(new File(savepicture++"/"+user.));
+//			}else{
+//				msg="用户不存在";
+//				statusCode="504";
+//				
+//			}
+//			
+//		}else{
+//			msg="输入不能为空";
+//			statusCode="503";
+//		}
+//		if(msg==null||"null".equals(msg))
+//			msg="\'\'";
+//		return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\",\"user_img\":\""+imgPath+"\"}";
+//	}
 	 @ResponseBody
 	@RequestMapping(value="/getSplash",method=RequestMethod.GET,produces = {"application/json;charset=UTF-8"})
-	 public String  getSplash(){
+	 public String  getSplash(HttpServletRequest request){
 		String jsessionid=request.getSession().getId();
+		String path =request.getRequestURL().toString();
+		String requestPath = path.split("user/")[0];
 		System.out.println("getSplash session    "+request.getSession().getId()+" =================="); 
 		
-			return "{\"JSESSION\":\""+jsessionid+"\",\"img\":\"/img/start.png\",\"status\":\"200\"}";
+			return "{\"JSESSION\":\""+jsessionid+"\",\"img\":\""+requestPath+"/image/start.png\",\"status\":\"200\"}";
 	 }
 	 /**
 	  * 邮箱激活回调
@@ -554,20 +701,25 @@ public class UserInfoController extends BaseController{
 	 @RequestMapping(value="/emailCallback",method=RequestMethod.GET,produces = {"application/json;charset=UTF-8"})
 	public String emailCallback(@RequestParam(value="email")String email,
 			@RequestParam(value="verifyEmail")String verifyEmail){
-			String msg="";
-		 String statusCode="200";
-		 msg=userInfoService.checkEmailVerify(email, verifyEmail);
+			String msg="200";
+//		 msg=userInfoService.checkEmailVerify(email, verifyEmail);
 		request.setAttribute("email", email);
 		request.setAttribute("msg", msg);
 		 if(!msg.equals("200")){
-			 statusCode="511";
 			 return "/bindingEmail/error";
 		 }else{
 			 return "/bindingEmail/success";
 			 
 		 }
 	}
-	
+	/**
+	 * 
+	 * @param userId
+	 * @param NewphoneNum
+	 * @param password
+	 * @return
+	 * @keerte
+	 */
 	 @ResponseBody
 	 @RequestMapping(value="/changePhone",method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
 	 public String changePhoneNum(@RequestParam(value="userID")String userId,
@@ -583,4 +735,9 @@ public class UserInfoController extends BaseController{
 		 }
 		 return "{\"status\":\""+statusCode+"\",\"msg\":\""+msg+"\"}";
 	 }
+	@Override
+	public Class getClassType() {
+		// TODO Auto-generated method stub
+		return this.getClass();
+	}
 }

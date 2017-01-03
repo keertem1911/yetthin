@@ -17,6 +17,12 @@
     from phoneversion
     where ID = #{id,jdbcType=INTEGER}
   </select>
+  <select id="getAll" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from phoneversion
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from phoneversion
     where ID = #{id,jdbcType=INTEGER}

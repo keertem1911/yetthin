@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.ProfitDataMapper">
+	<resultMap id="BaseResultMap" type="com.yetthin.web.domain.ProfitData">
+		<id column="profitdata_id" property="profitdataId" jdbcType="VARCHAR" />
+		<result column="profitdata_time" property="profitdataTime"
+			jdbcType="VARCHAR" />
+		<result column="profitdata_group_id" property="profitdataGroupId"
+			jdbcType="VARCHAR" />
+		<result column="profitdata_share_fund_num" property="profitdataShareFundNum"
+			jdbcType="DOUBLE" />
+		<result column="profitdata_stock" property="profitdataStock"
+			jdbcType="DOUBLE" />
+	</resultMap>
+
+	<resultMap id="BaseResultMapGroups" type="com.yetthin.web.domain.RecommendList">
+	<id column="group_id" property="groupId" jdbcType="VARCHAR" />
+		 
+		<result column="group_name" property="groupName" jdbcType="VARCHAR" />
+		<result column="income_ratio" property="incomeRatio" jdbcType="VARCHAR" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="VARCHAR" />
+		<result column="reasonword_content" property="recommendReason"
+			jdbcType="VARCHAR" />
+		<result column="user_vip_flag" property="vipFlag" jdbcType="INTEGER" />
+		<result column="group_create_time" property="createTime"
+			jdbcType="VARCHAR" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		profitdata_id, profitdata_time, profitdata_group_id,
+		profitdata_share_fund_num,
+		profitdata_stock
+	</sql>
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap"
+		parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata
+		where profitdata_id =
+		#{profitdataId,jdbcType=VARCHAR}
+	</select>
+	<select id="selectByGroupIdFromDay" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata
+		where profitdata_group_id =
+		#{groupId,jdbcType=VARCHAR}
+		order by profitdata_time desc
+		limit 2
+
+	</select>
+		<select id="selectByGroupId" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata
+		where profitdata_group_id =
+		#{groupId,jdbcType=VARCHAR}
+		order by profitdata_time desc
+
+	</select>
+	<select id="selectByGroupIdFromCuurentDay" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata
+		where profitdata_group_id =
+		#{groupId,jdbcType=VARCHAR}
+
+		order by profitdata_time desc
+		limit 1
+
+	</select>
+	<select id="selectByGroupIdFromLastMonth" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata p0,
+		(
+	select DATE_SUB(p1.profitdata_time,INTERVAL 1 MONTH)day,p1.profitdata_group_id g_id
+	 from tb_profitdata p1 
+	where p1.profitdata_group_id =#{groupId,jdbcType=VARCHAR}
+	order by profitdata_time desc limit 1)p2
+    <![CDATA[ where DATE(profitdata_time) < DATE(p2.day) and  profitdata_group_id=p2.g_id
+	order by profitdata_time desc limit 1 ]]>
+	</select>
+	<select id="selectByGroupIdFromCreateTime" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select 
+		<include refid="Base_Column_List" />
+		from tb_profitdata p0
+		where p0.profitdata_group_id =#{groupId,jdbcType=VARCHAR}
+		order by   p0.profitdata_time asc
+		limit 1
+		</select>
+	<select id="selectByGroupIdFromNear3Month" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from tb_profitdata p0,
+		(
+	select DATE_SUB(p1.profitdata_time,INTERVAL 3 MONTH)day,p1.profitdata_group_id g_id
+	 from tb_profitdata p1 
+	where p1.profitdata_group_id =#{groupId,jdbcType=VARCHAR}
+	order by profitdata_time desc limit 1)p2
+    <![CDATA[ where DATE(profitdata_time) < DATE(p2.day) and  profitdata_group_id=p2.g_id
+	order by profitdata_time desc limit 1 ]]>
+	</select>
+	<!-- 收益列表 -->
+	<!-- <select id="selectByGroupIdFromLastMonthList" parameterType="java.util.Map"
+		resultMap="BaseResultMapGroups">
+		select
+		group_id1 group_id,
+		g.group_name,
+		100*(tb_p.today_fund-p1.profitdata_share_fund_num)/p1.profitdata_share_fund_num
+		income_ratio,
+		u.user_name,
+		u.user_id,
+		r.reasonword_content,
+		u.user_vip_flag,
+		g.group_create_time
+
+		from tb_profitdata p1, tb_user u,tb_group g,tb_reasonword r,
+		(
+		SELECT p.profitdata_group_id group_id1,p.profitdata_share_fund_num
+		today_fund,p.profitdata_time todaytime from tb_profitdata p,
+		(select p1.profitdata_group_id id, MAX(p1.profitdata_time) maxtime
+		from tb_profitdata p1 group by p1.profitdata_group_id)p2
+		where  p.profitdata_time =p2.maxtime and p.profitdata_group_id=p2.id
+)tb_p
+ where tb_p.group_id1 = p1.profitdata_group_id and 
+ 	<if test="type ==0">
+ 	 <![CDATA[ DATE(p1.profitdata_time) <=  DATE_SUB(tb_p.todaytime,INTERVAL 1 MONTH)   ]]>
+ 	 </if>
+ 	 <if test="type ==1">
+ 	 <![CDATA[ DATE(p1.profitdata_time) <=  DATE_SUB(tb_p.todaytime,INTERVAL 1 YEAR)   ]]>
+ 	 </if>
+	   and u.user_id = g.group_create_id and g.group_id=p1.profitdata_group_id
+	 and g.group_id=r.reasonword_group_id   GROUP BY group_id1 LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	
+	</select> -->
+	  <select id="selectByGroupIdFromLastMonthList" parameterType="java.util.Map"
+		resultMap="BaseResultMapGroups">
+		select
+		tb_p.group_id1 group_id,
+		g.group_name,
+		100*(tb_p.today_fund-tb_pp.today_fund)/tb_pp.today_fund	 income_ratio,
+		u.user_name,
+		u.user_id,
+		r.reasonword_content,
+		u.user_vip_flag,
+		g.group_create_time
+ 
+ 	<![CDATA[	from    tb_user u,tb_group g,tb_reasonword r,
+ 	 	(select *from (SELECT p.profitdata_group_id group_id1,p.profitdata_share_fund_num
+		today_fund,p.profitdata_time todaytime from tb_profitdata p where p.profitdata_time <=#{endTime,jdbcType=VARCHAR}
+		order by p.profitdata_time desc)tb_p1 group by tb_p1.group_id1 )tb_p,
+		(select *from (SELECT p.profitdata_group_id group_id1,p.profitdata_share_fund_num
+		today_fund,p.profitdata_time todaytime from tb_profitdata p where p.profitdata_time >=#{beginTime,jdbcType=VARCHAR} 
+		order by p.profitdata_time asc)tb_p1 group by tb_p1.group_id1)tb_pp
+ 	 where tb_p.group_id1=tb_pp.group_id1  and u.user_id = g.group_create_id  
+	 and g.group_id=r.reasonword_group_id
+	   and g.group_id=tb_p.group_id1   LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	]]>
+	</select>  
+	<select id="selectByGroupIdFromTotleIncomeList" parameterType="java.util.Map"
+	resultMap="BaseResultMapGroups">
+	select
+		group_id1 group_id,
+		g.group_name,
+		100*(tb_p.today_fund-p1.profitdata_share_fund_num)/p1.profitdata_share_fund_num
+		income_ratio,
+		u.user_name,
+		u.user_id,
+		r.reasonword_content,
+		u.user_vip_flag,
+		g.group_create_time,
+		p1.profitdata_time
+		from tb_profitdata p1, tb_user u,tb_group g,tb_reasonword r,
+		(
+		SELECT p.profitdata_group_id group_id1,p.profitdata_share_fund_num
+		today_fund,p.profitdata_time todaytime from tb_profitdata p,
+		(select p1.profitdata_group_id id, MAX(p1.profitdata_time) maxtime
+		from tb_profitdata p1 group by p1.profitdata_group_id)p2
+		where  p.profitdata_time =p2.maxtime and p.profitdata_group_id=p2.id
+		)tb_p
+ 	   <![CDATA[	where tb_p.group_id1 = p1.profitdata_group_id  and 
+ 	 	  p1.profitdata_time  = (select p_0.profitdata_time from tb_profitdata p_0 where 
+			 p_0.profitdata_time  >=  g.group_create_time   AND p_0.profitdata_group_id=tb_p.group_id1 
+		 order by p_0.profitdata_time  limit 1 )
+		 ]]>
+	  	 and u.user_id = g.group_create_id and g.group_id=p1.profitdata_group_id
+	 	and g.group_id=r.reasonword_group_id 
+	     group by p1.profitdata_group_id
+	      LIMIT #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER}
+	</select>
+	<!-- time; incomeRate; indexWaveRate; <resultMap type="" id=""> <result 
+		column="" property="" jdbcType="VARCHAR" /> <result column="" property="" 
+		jdbcType="VARCHAR" /> <result column="" property="" jdbcType="VARCHAR" /> 
+		</resultMap> -->
+	<resultMap id="BaseResultCurrentIncome"  type="CurrentValue" >
+		<id column="profitdata_time" property="time" jdbcType="VARCHAR" />
+		<result column="income_rate" property="incomeRate" jdbcType="VARCHAR" />
+	
+	</resultMap>
+		 
+ 	<select id="getCurrentIncome" parameterType="java.util.Map" resultMap="BaseResultMap">
+ 		select 
+ 		<include refid="Base_Column_List"></include>
+ 		from tb_profitdata p 
+ 		 
+	where  p.profitdata_time  between  #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR}
+  			and p.profitdata_group_id = #{groupId,jdbcType=VARCHAR} order by DATE(p.profitdata_time)  
+ 	</select>  
+	
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+		delete from
+		tb_profitdata
+		where profitdata_id = #{profitdataId,jdbcType=VARCHAR}
+	</delete>
+	<delete id="deleteByGroupId" parameterType="java.lang.String">
+		delete from
+		tb_profitdata
+		where profitdata_group_id = #{groupId,jdbcType=VARCHAR}
+	
+	</delete>
+	<insert id="insert" parameterType="com.yetthin.web.domain.ProfitData">
+		<selectKey resultType="java.lang.String" keyProperty="profitdataId"
+			order="BEFORE">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into tb_profitdata (profitdata_id, profitdata_time,
+		profitdata_group_id,
+		profitdata_share_fund_num, profitdata_stock)
+		values (#{profitdataId,jdbcType=VARCHAR},
+		#{profitdataTime,jdbcType=VARCHAR},
+		#{profitdataGroupId,jdbcType=VARCHAR},
+		#{profitdataShareFundNum,jdbcType=DOUBLE},
+		#{profitdataStock,jdbcType=DOUBLE})
+	</insert>
+	<insert id="insertSelective" parameterType="com.yetthin.web.domain.ProfitData">
+		<selectKey resultType="java.lang.String" keyProperty="profitdataId"
+			order="BEFORE">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+		insert into tb_profitdata
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			profitdata_id,
+			<if test="profitdataTime != null">
+				profitdata_time,
+			</if>
+			<if test="profitdataGroupId != null">
+				profitdata_group_id,
+			</if>
+			<if test="profitdataShareFundNum != null">
+				profitdata_share_fund_num,
+			</if>
+			<if test="profitdataStock != null">
+				profitdata_stock,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			#{profitdataId,jdbcType=VARCHAR},
+			<if test="profitdataTime != null">
+				#{profitdataTime,jdbcType=VARCHAR},
+			</if>
+			<if test="profitdataGroupId != null">
+				#{profitdataGroupId,jdbcType=VARCHAR},
+			</if>
+			<if test="profitdataShareFundNum != null">
+				#{profitdataShareFundNum,jdbcType=DOUBLE},
+			</if>
+			<if test="profitdataStock != null">
+				#{profitdataStock,jdbcType=DOUBLE},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.ProfitData">
+		update tb_profitdata
+		<set>
+			<if test="profitdataTime != null">
+				profitdata_time = #{profitdataTime,jdbcType=VARCHAR},
+			</if>
+			<if test="profitdataGroupId != null">
+				profitdata_group_id =
+				#{profitdataGroupId,jdbcType=VARCHAR},
+			</if>
+			<if test="profitdataShareFundNum != null">
+				profitdata_share_fund_num =
+				#{profitdataShareFundNum,jdbcType=DOUBLE},
+			</if>
+			<if test="profitdataStock != null">
+				profitdata_stock = #{profitdataStock,jdbcType=DOUBLE},
+			</if>
+		</set>
+		where profitdata_id = #{profitdataId,jdbcType=VARCHAR}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.ProfitData">
+		update
+		tb_profitdata
+		set profitdata_time = #{profitdataTime,jdbcType=VARCHAR},
+		profitdata_group_id = #{profitdataGroupId,jdbcType=VARCHAR},
+		profitdata_share_fund_num = #{profitdataShareFundNum,jdbcType=DOUBLE},
+		profitdata_stock = #{profitdataStock,jdbcType=DOUBLE}
+		where
+		profitdata_id = #{profitdataId,jdbcType=VARCHAR}
+	</update>
+</mapper>

@@ -44,7 +44,8 @@ public class JTdoaController extends BaseController implements JtdoaValueMarket 
  	 * @return
  	 */
 	@ResponseBody
-	@RequestMapping(value="/shenzhen",method=RequestMethod.POST,produces = {"application/json;charset=UTF-8"})
+	@RequestMapping(value="/shenzhen",method=RequestMethod.POST,
+	produces = {"application/json;charset=UTF-8"})
 	public String shenzhen(@RequestParam(value="begin",required=false)String begin,
 			@RequestParam(value="end",required=false)String end,
 			@RequestParam(value="marketCode",required=false)String market,
@@ -189,35 +190,47 @@ public class JTdoaController extends BaseController implements JtdoaValueMarket 
 		return putReturnValue1(subStr[0], subStr[2], subStr[1]);
 	}
 	/**
-	 * 获取行业指数 预览
-	 * @param beginIndex
-	 * @param endIndex
-	 * @param time
+	 * 获取行业指数  成分股的组成
+	 * @param begin
+	 * @param end
+	 * @param 
 	 * @param size
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value="/getStockIndustryPlate",method=RequestMethod.POST,
+	@RequestMapping(value="/getStockIndexChild",method=RequestMethod.POST,
 	produces={"application/json;charset=utf-8"})
-	public String getStockIndustry(@RequestParam(value="begin")String beginIndex,
-			@RequestParam(value="end")String endIndex,
-			@RequestParam(value="time")String time,
-			@RequestParam(value="timeNum")String size
+	public String getStockIndexChild(@RequestParam(value="begin",required=false)String begin,
+			@RequestParam(value="end",required=false)String end,
+			@RequestParam(value="stockIndex")String stockIndex,
+			@RequestParam(value="master",required=false)boolean master
 			){
-		String [] subStr=jtdoaService.getStockIndustry(beginIndex,endIndex,time,size);
-		return putReturnValue1(subStr[0], subStr[2], subStr[1]);
+		if(begin==null){
+			begin ="0";
+		}
+		if(end==null){
+			end ="10";
+		}
+		 
+		String  subStr=jtdoaService.getStockIndexChild(begin, end, stockIndex,master);
+		return  subStr;
 	}
-	@ResponseBody
-	@RequestMapping(value="/getStockIndustryDK",method=RequestMethod.POST,
-	produces={"application/json;charset=utf-8"})
-	public String getStockIndustryDK(@RequestParam(value="sid")String id,
-			@RequestParam(value="time")String time,
-			@RequestParam(value="timeNum")String size
-			){
-	 
-	
-		String [] subStr=jtdoaService.getStockIndustryDK(id,time,size);
-		return putReturnValue3(subStr[0], subStr[2], subStr[1]);
+//	@ResponseBody
+//	@RequestMapping(value="/getStockIndustryDK",method=RequestMethod.POST,
+//	produces={"application/json;charset=utf-8"})
+//	public String getStockIndustryDK(@RequestParam(value="sid")String id,
+//			@RequestParam(value="time")String time,
+//			@RequestParam(value="timeNum")String size
+//			){
+//	 
+//	
+//		String [] subStr=jtdoaService.getStockIndustryDK(id,time,size);
+//		return putReturnValue3(subStr[0], subStr[2], subStr[1]);
+//	}
+	@Override
+	public Class getClassType() {
+		// TODO Auto-generated method stub
+		return this.getClass();
 	}
 	
 }

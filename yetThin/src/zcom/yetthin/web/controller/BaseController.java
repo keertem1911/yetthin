@@ -2,10 +2,12 @@ package zcom.yetthin.web.controller;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,10 +16,11 @@ import com.yetthin.web.commit.Md5UnitTool;
 
 @Component
 @Scope("prototype")
-public class BaseController {
+public abstract class BaseController {
+	protected final Logger logger =Logger.getLogger(getClassType());
 	// 设置 COOKIE 标志位
 	private static final String AUTH_COOKIE_NAME = "yetthin";
-
+	public abstract Class getClassType();
 	protected    HttpServletRequest request;
 	protected HttpServletResponse response;
 	
@@ -57,5 +60,9 @@ public class BaseController {
 
 		return res;
 	}
-
+	protected String getUUID(){
+		String s =UUID.randomUUID().toString();
+		s=s.substring(0,8)+s.substring(9,13)+s.substring(14,18)+s.substring(19,23)+s.substring(24);
+		return s;
+	}
 }

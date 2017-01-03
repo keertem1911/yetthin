@@ -1,6 +1,5 @@
 package com.yetthin.web.domain;
 
-import java.util.Comparator;
 
 public class stockKempty{
 	private String stockCode;
@@ -11,6 +10,19 @@ public class stockKempty{
 	private String close;
 	private int passRate;
 	private int fundRate;
+	
+	public stockKempty( ) {
+	 
+		this.stockCode = null;
+		this.stockName = null;
+		this.open = null;
+		this.height = null;
+		this.low = null;
+		this.close = null;
+		this.passRate = 0;
+		this.fundRate = 0;
+	}
+
 	public int getPassRate() {
 		return passRate;
 	}

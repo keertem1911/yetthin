@@ -81,7 +81,7 @@ public class JTdoa {
 		 */
 		/*以下代码可自由定义*/
  		System.out.println(tickId+" "+symbol+" "+secType+" "+currency+" "+TickType.values()[tickType]+" "+L1Value+" "+size);
- 		jtdoaDao.Level1Data(tickId,symbol,secType,exchange,currency,tickType,L1Value,size);
+// 		jtdoaDao.Level1Data(tickId,symbol,secType,exchange,currency,tickType,L1Value,size);
 	}
 	/**
 	 * TDOASubscribeMarketData

@@ -1,7 +1,5 @@
 package com.yetthin.web.commit;
 
-import java.util.ArrayList;
-import java.util.ListIterator;
 
 import util.BarData;
 import util.Contract;

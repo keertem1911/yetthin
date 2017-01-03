@@ -1,16 +1,18 @@
 package zcom.yetthin.web.listener;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.net.URL;
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
 
 import com.yetthin.web.commit.JtdoaValueMarket;
 import com.yetthin.web.commit.QQMarketLevelUtilByMaster;
@@ -30,8 +32,7 @@ SinaMarketIndex,JtdoaValueMarket{
 	
 	private JtdoaAPIDao jtdoaAPIDao=new JtdoaAPIDao();
 	
-	private String userName=null;
-	private String passwd=null;
+	
 	private static final int dev_num=20;
 	private  String FILE_NAME_PATH;
 	private UrlRequestDao urlRequestDao=new UrlRequestDao();
@@ -42,138 +43,109 @@ SinaMarketIndex,JtdoaValueMarket{
 		// TODO Auto-generated constructor stub
 	}
 	private Executor executor = Executors.newFixedThreadPool(200);
-	private static final String [] TIME1 ={"09:20","11:00"};
-	private static final String [] MIDDLE_TIME= {"11:01","12:59"};
-	private static final String [] TIME2={"13:05","15:00"};  
-	private static final String [] SAVE_DAY_K={"06:59","07:01"};
+	private static final String [] TIME1 ={"09:20:00","11:10:00"};
+	private static final String [] TIME2={"13:05:00","15:10:00"};  
+	private static final String [] SAVE_DAY_K={"19:00:00","20:55:00"};
+	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {
-		// TODO Auto-generated method stub
 	}
-	private boolean  AfterTimeCompared(String current,String target){
-		boolean aftercompared=false;
-		// 09:31  09:30
-		if(current.split(":")[0].compareTo(target.split(":")[0])>0){
-			aftercompared=true;
-		}else{
-			if(current.split(":")[0].compareTo(target.split(":")[0])==0){
-				if(current.split(":")[1].compareTo(target.split(":")[1])>0){
-					aftercompared=true;
-				}
+	private static DateTimeFormatter formatter_hh_mm=DateTimeFormatter.ofPattern("HH:mm:ss");
+	 /**
+		 *  [20:00:00,21:20:00] now time is 21:00:12  return false else true
+		 */
+		public  boolean TimeOut(String[] timeStr){
+			boolean isTimeOut=true;
+			LocalTime time1= LocalTime.parse(timeStr[0],formatter_hh_mm );
+			LocalTime time2= LocalTime.parse(timeStr[1],formatter_hh_mm );
+			LocalTime timeNow= LocalTime.now();
+			LocalDate date= LocalDate.now();
+			Duration dut= Duration.between(time1, timeNow);
+			Duration dut2=Duration.between(timeNow, time2);
+			if(date.getDayOfWeek()!=DayOfWeek.SATURDAY&&date.getDayOfWeek()!=DayOfWeek.SUNDAY)
+			if(dut.getSeconds()>0&&dut2.getSeconds()>0){
+				isTimeOut=false;
 			}
+			return isTimeOut;
 		}
-		return aftercompared;
-	}
-	private static final SimpleDateFormat dateFormat=new SimpleDateFormat("HH:mm");
-	 private boolean isTimeOut(String [] data1,String []data2){
-		 boolean timeOut=true;
-		 Calendar cal = Calendar.getInstance();
-		 String currentTime = dateFormat.format(System.currentTimeMillis());
-		 if(data2!=null){
-		if(AfterTimeCompared(currentTime, data1[0])&&!AfterTimeCompared(currentTime, data1[1])
-				||AfterTimeCompared(currentTime, data2[0])&&!AfterTimeCompared(currentTime, data2[1])){
-			 if(cal.get(Calendar.DAY_OF_WEEK)>1&&cal.get(Calendar.DAY_OF_WEEK)<7){
-				 timeOut=false;
-			 	}
-			}
-		}else{
-			if(AfterTimeCompared(currentTime, data1[0])&&!AfterTimeCompared(currentTime, data1[1])
-					) 
-				 if(cal.get(Calendar.DAY_OF_WEEK)>1&&cal.get(Calendar.DAY_OF_WEEK)<7){
-					 timeOut=false;
-				 	}
-		}
-		 return timeOut;
-	 }
- 
 	private void init() {
 		System.out.println("come into --------------------");
-		
+		try {
+			URL listers =CreateJdoaListener.class.getResource("");
+			 
+			 String systems = listers.getPath().split("zcom")[0]+"symbol.txt";
+			 
+			 FILE_NAME_PATH=systems;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		 
 		executor.execute(new Runnable() {
 			 
 			public void run() {
 				ReadTextSymbol test = new ReadTextSymbol();
-				 long before=0l;
-				 long currency=0l;
-				final  long timerCnt=60; 
-				boolean beforeB=true;
+				boolean flushProfit=false;
 				List<String> symbols = test.readSymolByString(FILE_NAME_PATH);
+				 
 				List<Contract> list = test.readTextByContract(FILE_NAME_PATH);
+				long cnt1 =0; 
 				if(initFlag)
    				RedisOfReader.initReadInredisKeyLevel1(list);
 				 //股票 更新 详细信息   开盘价  收盘价 摆单情况
-				
-				 
 				while(true){
 					System.out.println(" begin ===========");
-					if(beforeB)
-						currency =before=System.currentTimeMillis();
-					beforeB=false;
 					list=test.readTextByContract(FILE_NAME_PATH);
-				  
-				if(!isTimeOut(TIME1,TIME2)){
+				LocalDate localdate= LocalDate.now();
+ 				 
+				if(!TimeOut(TIME1)||!TimeOut(TIME2)){
+					System.out.println("stcok ");
 					 try {	
-				for(int j=0;j<10;++j){
+				for(int j=0;j<symbols.size()/dev_num;++j){
 					StringBuffer sb=new StringBuffer();
 					int cnt=dev_num;
 					if(j==((symbols.size()/dev_num))&&symbols.size()%1000!=0)
 						cnt=symbols.size()%dev_num;
 				 for (int i = 0; i < cnt; i++) {
 					sb.append(symbols.get(j*dev_num+i));
+					 
 					 if(i!=symbols.size()-1)
 						sb.append(",");
 				}
-				
 					 List<String> values=urlRequestDao.readContentFromGet(QQ_M_REQUEST_URL+sb.toString());
-					 
 					 jtdoaAPIDao.saveQQ_M_REQUEST_URL(values,false);
 				}// end in  for(int j=0;j<symbols.size()/dev_num;++j){ 股票更新完成 一轮
 				//余数更新
 			 
 				StringBuffer sb=new StringBuffer(); 
 				for (int i = 0; i < symbols.size()%dev_num; i++) {
-					  
 					sb.append(symbols.get((symbols.size()/dev_num)*dev_num+i));
 					if(i!=symbols.size()-1)
 						sb.append(",");
 				}//for
-				 
 				 List<String> values=	urlRequestDao.readContentFromGet(QQ_M_REQUEST_URL+sb.toString());
 				 
 				 jtdoaAPIDao.saveQQ_M_REQUEST_URL(values,false);
-				 
+				 flushProfit=false;
 						Thread.sleep(SECOND*9);
-				/**
-				 * 行业板块更新	
-				 */
-						System.out.println("save sss");
-						jtdoaAPIDao.updateSecondK();
-						currency=System.currentTimeMillis();
-						System.out.println("curreny:"+dateFormat.format(currency)+" before:"+new Date(before)+" =>"+ (currency-before)/1000+"    cnt ========");
-						if((currency-before)/1000>(timerCnt-5)){
-							before=currency;
-							System.out.println(new Date(currency)+" ==========================");
-							jtdoaAPIDao.updateMinuteKandIndex();
-						} 
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
  				 }else{//if timeOut
  					 System.out.println("time out ");
- 					 if(!isTimeOut(SAVE_DAY_K, null)){
- 						jtdoaAPIDao.clearMSvaeD();
+ 					  
+ 					 if(localdate.getDayOfWeek().getValue()!=7&&localdate.getDayOfWeek().getValue()!=6){
+ 					 if(!TimeOut(SAVE_DAY_K)&&flushProfit==false){
+ 						flushProfit=true;
+ 						System.out.println(LocalTime.now()+"   "+flushProfit);
+ 						jtdoaAPIDao.updateProfitData();
+ 						System.out.println("update progitdata over !!!!!!!!!!!!!!!");
  					} 
- 					 if(isTimeOut(MIDDLE_TIME, null)){
- 						 if(jtdoaAPIDao.getRedisLengthBySelect(5)!=0){
- 						 jtdoaAPIDao.flushKS();
- 						 jtdoaAPIDao.getMysqlLastDay(userName,passwd);
- 						 }
  					 }
- 					 System.out.println("time out ");
+ 					 System.out.println("time out "+flushProfit+" "+localdate);
  					 try {
-						Thread.sleep(1000*60*30);
+						Thread.sleep(1000*60*60);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -193,7 +165,7 @@ SinaMarketIndex,JtdoaValueMarket{
 				int single=0;
 				while(true){
 
-					if(!isTimeOut(TIME1,TIME2)){
+					if(!TimeOut(TIME1)||!TimeOut(TIME2)){
 		    	StringBuffer sb=new StringBuffer();
 		    	for (int i = 0; i < husheng.length; i++) {
 					sb.append(""+husheng[i][0].substring(7).toLowerCase()+husheng[i][0].substring(0, 6));
@@ -216,7 +188,7 @@ SinaMarketIndex,JtdoaValueMarket{
 					}else{ //if
 						System.out.println("time out ");
 						 try {
-								Thread.sleep(1000*60*30);
+								Thread.sleep(1000*60*60);
 							} catch (InterruptedException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -231,12 +203,11 @@ SinaMarketIndex,JtdoaValueMarket{
 
 	@Override
 	public void contextInitialized(ServletContextEvent arg0) {
-		String path=arg0.getServletContext().getInitParameter("path");
+		 
 		String initFlag=(arg0.getServletContext().getInitParameter("initFlag"));
-		userName =arg0.getServletContext().getInitParameter("username");
-		passwd= arg0.getServletContext().getInitParameter("passwd");
+		 
 		this.initFlag=Boolean.parseBoolean(initFlag);
-		FILE_NAME_PATH=path;
+		 
 		// TODO Auto-generated method stub
 		Runnable run=new Runnable() {
 			public void run() {

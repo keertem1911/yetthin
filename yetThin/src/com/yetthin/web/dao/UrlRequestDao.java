@@ -3,21 +3,20 @@ package com.yetthin.web.dao;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Repository;
 
 @Repository("UrlRequestDao")
 public class UrlRequestDao {
-	private final static String  CHARACTER_SET="utf-8";
-    public   List<String> readContentFromGet(String url) throws IOException {   
+	private final static String  CHARACTER_SET="gbk";
+    public    List<String> readContentFromGet(String url) throws IOException {   
 
         // 拼凑get请求的URL字串，使用URLEncoder.encode对特殊和不可见字符进行编码   
      
@@ -34,7 +33,7 @@ public class UrlRequestDao {
         connection.connect();   
         // 发送数据到服务器并使用Reader读取返回的数据   
         //gb2312
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),"gbk"));   
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),CHARACTER_SET));   
 //        System.out.println(" ============================= ");   
 //
 //        System.out.println(" Contents of get request ");   
@@ -43,7 +42,7 @@ public class UrlRequestDao {
 
         String lines;   
         while ((lines = reader.readLine()) != null) {   
-      
+        	 
         	String [] subStr = lines.split("=");
         	String value=subStr[1];
         	value=value.replace("\"", "");
@@ -60,7 +59,47 @@ public class UrlRequestDao {
   //      System.out.println(Arrays.asList(list));
         return list;
  }   
+    public    List<String> readContentFromGet(String url,Function<String, String> fun) throws IOException {   
+    	List<String> list=new LinkedList<>();
+    	try{
+        // 拼凑get请求的URL字串，使用URLEncoder.encode对特殊和不可见字符进行编码   
+     
+        URL getUrl = new URL(url);   
+        
+        // 根据拼凑的URL，打开连接，URL.openConnection()函数会根据 URL的类型，返回不同的URLConnection子类的对象，在这里我们的URL是一个http，因此它实际上返回的是HttpURLConnection   
 
+        HttpURLConnection connection = (HttpURLConnection) getUrl.openConnection();   
+        connection.setRequestProperty("Charset", "UTF-8"); 
+        connection.setRequestProperty("Accept-Charset", "UTF-8");
+        // 建立与服务器的连接，并未发送数据   
+
+        connection.connect();   
+        // 发送数据到服务器并使用Reader读取返回的数据   
+        //gb2312
+        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(),CHARACTER_SET));   
+//        System.out.println(" ============================= ");   
+//
+//        System.out.println(" Contents of get request ");   
+//
+//        System.out.println(" ============================= ");   
+
+        String lines;   
+        while ((lines = reader.readLine()) != null) {   
+        	list.add(fun.apply(lines));
+     	   }   
+        
+        reader.close();   
+    	
+        // 断开连接   
+
+        connection.disconnect();
+    	}catch (Exception e) {
+			// TODO: handle exception
+    		e.printStackTrace( );
+		}
+  //      System.out.println(Arrays.asList(list));
+        return list;
+ }   
 
 
  private String readContentFromPost(String url) throws IOException {   
@@ -147,4 +186,5 @@ public class UrlRequestDao {
         //connection.disconnect();   
         return "";
  }   
+ 
 }

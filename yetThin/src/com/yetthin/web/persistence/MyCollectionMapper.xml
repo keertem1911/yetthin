@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.MyCollectionMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.MyCollection" >
+    <id column="collection_id" property="collectionId" jdbcType="INTEGER" />
+    <result column="collection_group_id" property="collectionGroupId" jdbcType="VARCHAR" />
+    <result column="collection_user_id" property="collectionUserId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    collection_id, collection_group_id, collection_user_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_collection
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </select>
+  <select id="getMyCollectionByUserId" parameterType="string" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_collection
+    where collection_user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByUserIdAndGroupId" parameterType="java.util.Map" resultMap="BaseResultMap">
+  select 
+    <include refid="Base_Column_List" />
+    from tb_collection
+    where collection_user_id = #{userId,jdbcType=VARCHAR}
+    and collection_group_id = #{groupId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByUserId" parameterType="string" resultType="string">
+	select 
+    collection_group_id
+    from tb_collection
+    where collection_user_id = #{userId,jdbcType=VARCHAR}
+  
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_collection
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.MyCollection" >
+    <selectKey resultType="java.lang.Integer" keyProperty="collectionId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_collection (collection_id, collection_group_id, 
+      collection_user_id)
+    values (#{collectionId,jdbcType=INTEGER}, #{collectionGroupId,jdbcType=VARCHAR}, 
+      #{collectionUserId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.MyCollection" >
+    <selectKey resultType="java.lang.Integer" keyProperty="collectionId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_collection
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      collection_id,
+      <if test="collectionGroupId != null" >
+        collection_group_id,
+      </if>
+      <if test="collectionUserId != null" >
+        collection_user_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{collectionId,jdbcType=INTEGER},
+      <if test="collectionGroupId != null" >
+        #{collectionGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="collectionUserId != null" >
+        #{collectionUserId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.MyCollection" >
+    update tb_collection
+    <set >
+      <if test="collectionGroupId != null" >
+        collection_group_id = #{collectionGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="collectionUserId != null" >
+        collection_user_id = #{collectionUserId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.MyCollection" >
+    update tb_collection
+    set collection_group_id = #{collectionGroupId,jdbcType=VARCHAR},
+      collection_user_id = #{collectionUserId,jdbcType=VARCHAR}
+    where collection_id = #{collectionId,jdbcType=INTEGER}
+  </update>
+</mapper>

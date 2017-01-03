@@ -4,14 +4,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.annotation.Resource;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.yetthin.web.commit.Md5UnitTool;
 import com.yetthin.web.commit.sendEmailVerify;
 
@@ -24,10 +22,16 @@ public class BaseService {
 	 
 	private Md5UnitTool md5Tool = Md5UnitTool.getInstance();
 	
-	protected SimpleDateFormat simple=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//	protected SimpleDateFormat simple=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	protected static DateTimeFormatter simple=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//	protected  SimpleDateFormat format_yyyyMMdd =new SimpleDateFormat("yyyy/MM/dd");
+	protected static DateTimeFormatter format_yyyyMMdd=DateTimeFormatter.ofPattern("yyyy/MM/dd");
+	protected static DateTimeFormatter format_yyyy_MM_dd=DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-	protected  SimpleDateFormat format_yyyyMMdd =new SimpleDateFormat("yyyy/MM/dd");
+//	protected  SimpleDateFormat format_yyyy_MM_dd =new SimpleDateFormat("yyyy-MM-dd");
+	protected  DecimalFormat   format_double_1=new   java.text.DecimalFormat("#");  
 	protected  DecimalFormat   format_double_2=new   java.text.DecimalFormat("#.#");  
+	protected  DecimalFormat   format_double_3=new   java.text.DecimalFormat("#.##");  
 	protected  SimpleDateFormat format_hhmm=new SimpleDateFormat("hh:mm");
 	
 	@Resource(name="Sender")
@@ -52,6 +56,7 @@ public class BaseService {
 		
 		StringBuffer buffer =new StringBuffer();
 		buffer.append("\"value\":[");
+		if(list==null||list.size()==0) return buffer.toString()+"]";
 		Class clazz =list.get(0).getClass();
 		Field[] fiedls = clazz.getDeclaredFields();
 		final String [] fiedlsName=new String [fiedls.length];
@@ -66,15 +71,16 @@ public class BaseService {
 			Method method = clazz.getDeclaredMethod("get"+fiedlsName[j]);
 			Object value = method.invoke(list.get(i));
 			String name =fiedlsName[j].substring(0, 1).toLowerCase()+fiedlsName[j].substring(1);
-			if(value!=null)
+			if(value!=null){
 			buffer.append("\""+name+"\":\""+value+"\"");
 			
 			if(j!=fiedlsName.length-1)
 				buffer.append(",");
+			}
 				}catch(Exception e){
 					e.printStackTrace();
 					}
-				 
+				
 			}
 			
 			buffer.append("}");
@@ -106,7 +112,7 @@ public class BaseService {
 			String name =fiedlsName[j].substring(0, 1).toLowerCase()+fiedlsName[j].substring(1);
 			Class<?> type = fiedls[j].getType();
 			String tmp =null;
-			if(type==String.class){
+			if(type==String.class&&value!=null){
 				String val =(String)value;
 				if(val.indexOf("{")>0)
 					tmp=val;
@@ -131,10 +137,17 @@ public class BaseService {
 		return buffer.toString();
 		
 	}
+	//4 1 3 
 	protected int[] partitionPage(int totlePage,int pageNum,int pageSize){
 		int [] page=new int [3];
-		int totlePageNum=totlePage/pageSize;
-		if(pageNum>totlePageNum) pageSize=totlePageNum;
+		 
+		if(totlePage==0)
+			return new int[]{0,0,0};
+		int totlePageNum=totlePage/pageSize;//  2=6/3
+		if(totlePageNum==0) return new int[]{0,totlePage,totlePage};
+		 
+		
+//		if(pageNum>totlePageNum) pageNum=totlePageNum;
 		if(pageNum<=0) pageNum=1;
 		
 		if(totlePage%pageSize!=0) 
@@ -142,11 +155,11 @@ public class BaseService {
 		int begin=0;
 		int end=0;
 		if(pageNum==totlePageNum){
-			begin =(totlePageNum-1)*pageSize+1;
-			end=totlePage;
+			begin =(totlePageNum-1)*pageSize;
+			end=1;
 		}else{
-		 begin=(pageSize-1)*pageSize+1;
-		 end =(pageSize)*pageSize;
+		 begin=(pageNum-1)*pageSize;
+		 end =pageSize;
 		}
 		page[0]=begin;
 		page[1]=end;
@@ -161,5 +174,10 @@ public class BaseService {
 			requestPath=matcher.group(0);
 		}
 		return requestPath;
+	}
+	protected String getUUID(){
+		String s =UUID.randomUUID().toString();
+		s=s.substring(0,8)+s.substring(9,13)+s.substring(14,18)+s.substring(19,23)+s.substring(24);
+		return s;
 	}
 }

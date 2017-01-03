@@ -1,9 +1,11 @@
 package com.yetthin.web.domain;
 
 public class GroupDetail {
+	private String groupId;
 	private String groupName ;
 	private String emotionIndex ;
 	private String totleIncome ;
+	private String totleIncomeRatio;
 	private String evaluateLevel ;
 	private String dayIncome ;
 	private String monthIncome ;
@@ -15,7 +17,64 @@ public class GroupDetail {
 	private String belongDepart ;
 	private String near3MonthIncome ;
 	private String latestChangeShareTime ;
+	private String createGroupTime;
+	private String ifOpen;
+	private String myAgreeNum;
+	private String isMyAgree;
+	private String isMyCollection;
 	
+	public String getIsMyCollection() {
+		return isMyCollection;
+	}
+	public void setIsMyCollection(String isMyCollection) {
+		this.isMyCollection = isMyCollection;
+	}
+	public String getIsMyAgree() {
+		return isMyAgree;
+	}
+	public void setIsMyAgree(String isMyAgree) {
+		this.isMyAgree = isMyAgree;
+	}
+	public String getMyAgreeNum() {
+		return myAgreeNum;
+	}
+	public void setMyAgreeNum(String myAgreeNum) {
+		this.myAgreeNum = myAgreeNum;
+	}
+	public String getCreateGroupTime() {
+		return createGroupTime;
+	}
+	public void setCreateGroupTime(String createGroupTime) {
+		this.createGroupTime = createGroupTime;
+	}
+	public String getTotleIncomeRatio() {
+		return totleIncomeRatio;
+	}
+	public void setTotleIncomeRatio(String totleIncomeRatio) {
+		this.totleIncomeRatio = totleIncomeRatio;
+	}
+	public String getIfOpen() {
+		return ifOpen;
+	}
+	public void setIfOpen(String ifOpen) {
+		this.ifOpen = ifOpen;
+	}
+
+	// 选择标的的是否显示列表
+	private String stockLableList;
+	 
+	public String getStockLableList() {
+		return stockLableList;
+	}
+	public void setStockLableList(String stockLableList) {
+		this.stockLableList = stockLableList;
+	}
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 	public String getUserImg() {
 		return userImg;
 	}
@@ -100,6 +159,21 @@ public class GroupDetail {
 	public void setLatestChangeShareTime(String latestChangeShareTime) {
 		this.latestChangeShareTime = latestChangeShareTime;
 	}
-	
+	public void setGroup(Group group ){
+		this.groupId=group.getGroupId();
+		this.groupName=group.getGroupName();
+		this.emotionIndex=group.getGroupEmotionIndex()+"";
+		this.totleIncome=group.getGroupIncomeTotle()+"";
+		this.evaluateLevel=group.getGroupEvaluateLevel();
+		this.ifOpen= group.getGroupOpen();
+		this.createGroupTime=group.getGroupCreateTime();
+	}
+	 
+	public void setUser(User user){
+		this.userName=user.getUserName();
+		this.userId=user.getUserId();
+		this.vipFlag=user.getUserVipFlag();
+		this.belongDepart=user.getUserFirm();
+	}
 
 }

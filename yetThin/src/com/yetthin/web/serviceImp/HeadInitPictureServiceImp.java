@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSON;
 import com.yetthin.web.domain.HeadPicture;
@@ -25,7 +27,8 @@ public class HeadInitPictureServiceImp extends BaseService  implements HeadInitP
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Exception.class)
 	@Override
 	public int save(HeadPicture entity) throws Exception {
 		// TODO Auto-generated method stub

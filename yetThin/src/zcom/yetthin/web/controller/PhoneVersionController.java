@@ -1,6 +1,7 @@
 package zcom.yetthin.web.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
@@ -30,15 +31,34 @@ public class PhoneVersionController {
 		String msg=null;
 		String statusCode="200";
 		System.out.println("come into checkNewVersion $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-		PhoneVersion pv=new PhoneVersion();
-		pv.setApkUrl("www.baidu.com");
-		pv.setExplain("版本1 wwwhawavfeawsiofhawihfoi阿瓦打我的");
-		pv.setVersionCode("#include <stdio.h>");
-		pv.setVersionName("yetthin1.1");
-		map.put("items", pv);
+		
+		List<PhoneVersion> pv=phoneVersionService.getListAll();
+		
+		 if(pv!=null&&pv.size()!=0)
+		map.put("items", pv.get(0));
+		 else
+			 map.put("item", new PhoneVersion());
 		if(msg!=null&&!"".equals(msg))
 		map.put("msg", msg);
 		map.put("status", statusCode);
 		return map;
 	}
+//	@ResponseBody
+//	@RequestMapping(value="/checkNewVersion",method=RequestMethod.GET,produces = {"application/json;charset=UTF-8"})
+//	public Map<String, Object> checkNewVersion(MultipartFile file,httpreq){
+//		Map<String, Object> map=new HashMap<>();
+//		String msg=null;
+//		String statusCode="200";
+//		System.out.println("come into checkNewVersion $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//		PhoneVersion pv=new PhoneVersion();
+//		pv.setApkUrl("www.baidu.com");
+//		pv.setExplain("版本1 wwwhawavfeawsiofhawihfoi阿瓦打我的");
+//		pv.setVersionCode("#include <stdio.h>");
+//		pv.setVersionName("yetthin1.1");
+//		map.put("items", pv);
+//		if(msg!=null&&!"".equals(msg))
+//		map.put("msg", msg);
+//		map.put("status", statusCode);
+//		return map;
+//	}
 }

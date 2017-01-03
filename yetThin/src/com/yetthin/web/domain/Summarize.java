@@ -1,10 +1,18 @@
 package com.yetthin.web.domain;
 
 public class Summarize {
-	private String sumIncome;	
 	private String groupName;	
+	private String groupId;
 	private String createTime;	
+	private String sumIncome;	
 	private String RecommentNum;
+	
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 	public String getSumIncome() {
 		return sumIncome;
 	}

@@ -1,6 +1,8 @@
 package zcom.yetthin.web.controller;
 
  
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +21,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.alibaba.fastjson.JSON;
 import com.yetthin.web.domain.Admin;
+import com.yetthin.web.domain.Message;
 import com.yetthin.web.domain.PhoneVersion;
-import com.yetthin.web.domain.UserInfo;
+import com.yetthin.web.domain.User;
 import com.yetthin.web.service.AdminService;
 import com.yetthin.web.service.PhoneVersionService;
 import com.yetthin.web.service.UserInfoService;
@@ -96,16 +101,12 @@ public class AdminController extends BaseController {
 		// TODO Auto-generated constructor stub
 
 	}
-
+	@ResponseBody
 	@RequestMapping(value = "/showUserinfo", method = RequestMethod.GET)
 	public String selectUserAllInfo(Model model) {
-		List<UserInfo> lists = userInfoService.getListAll();
-		if (lists.size() == 0 || lists == null) {
-			model.addAttribute("admin_error", "用户为空");
-		} else {
-			model.addAttribute("users", lists);
-		}
-		return "/admin/showUserinfo";
+		List<User> lists = userInfoService.getListAll();
+		 
+		return JSON.toJSONString(lists);
 	}
 
 	@ResponseBody
@@ -114,7 +115,7 @@ public class AdminController extends BaseController {
 	 
 		Map<String, Object> map = new HashMap<>();
 
-		UserInfo ui = userInfoService.selectByPhoneNum(phoneNum);
+		User ui = userInfoService.selectByPhoneNum(phoneNum);
 		if (ui != null) {
 			map.put("user", ui);
 		} else {
@@ -124,61 +125,83 @@ public class AdminController extends BaseController {
 	}
 
 	@ResponseBody
-	@RequestMapping(value = "/selectByEmail", method = RequestMethod.GET)
-	public Map<String, Object> selectUserByEmail(@RequestParam(value = "email") String email) {
+	@RequestMapping(value = "/updateUserInfo", method = RequestMethod.POST)
+	public String updateUser(User user) {
 		Map<String, Object> map = new HashMap<>();
-
-		UserInfo ui = userInfoService.selectByEmail(email);
-		if (ui != null) {
-			map.put("user", ui);
-		} else {
-			map.put("error", "用户不存在");
+		Message m= new Message();
+		User userOld = userInfoService.selectUserDetailById(user.getUserId());
+		if(userOld!=null){
+		int i  = userInfoService.updateUser(user);
+		m.setValue(i+"");
+		if(i!=0){
+			m.setStatus("200");
+			m.setInfo("update success");
+		}else{
+			m.setStatus("500");
+			m.setInfo("update failed");
 		}
-		return map;
+		} else {
+			m.setStatus("500");
+			m.setInfo("userId not find");
+			m.setValue("");
+		}
+		return JSON.toJSONString(m);
 
 	}
 
-	@ResponseBody
-	@RequestMapping(value = "/updateNewVersionDo", method = RequestMethod.PUT)
-	public String updateNewVersionDo(PhoneVersion pv) throws Exception {
-		int i = phoneVersionService.save(pv);
-		String flag = "200";
-		return i == 0 ? "error" : flag;
-	}
+	 
 
 	@ResponseBody
-	@RequestMapping(value = "/updateNewVersion2", method = RequestMethod.POST)
-	public String updateNewVersiontext(@RequestParam(value = "file") MultipartFile file) {
-		// try {
-		// InputStream is= file.getInputStream();
-		// Reader reader=new InputStreamReader(is, "utf-8");
-		// BufferedReader bffer=new BufferedReader(reader);
-		// String line=null;
-		// while((line=bffer.readLine())!=null){
-		// System.out.println(line);
-		// }
-		// is.close();
-		// } catch (UnsupportedEncodingException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
+	@RequestMapping(value = "/updateNewVersiontext", method = RequestMethod.POST)
+	public String updateNewVersiontext(PhoneVersion pv,@RequestParam(value = "file") MultipartFile file,
+			HttpServletRequest request) {
+		
+		  
+			 String path=request.getRequestURL().toString().split("admin/")[0]+"version";
+			 String realpath=request.getServletContext().getRealPath("")+"/version";
+			 String fileName =file.getOriginalFilename();
+			 String end =fileName.substring(fileName.lastIndexOf("."));
+			  
+			 pv.setApkUrl(path+"/smartApp"+end);
+			 
+			 File distory= new File(realpath+"/smartApp"+end);
+			 if(distory.exists())
+				 distory.delete();
+			 try {
+				file.transferTo(distory);
+				List<PhoneVersion> list = phoneVersionService.getListAll();
+				if(list!=null&&list.size()!=0){
+					PhoneVersion oldPv= list.get(0);
+					pv.setId(oldPv.getId());
+					phoneVersionService.update(pv);
+				}
+				else
+				 phoneVersionService.save(pv);
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		 
 		System.out.println(file.getOriginalFilename() + "&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
 		return "200";
 	}
 
-	@RequestMapping(value = "/lookfeedback", method = RequestMethod.GET)
-	public String lookUserIdeaText(Model model) {
-
-		List<UserInfo> lists = userInfoService.lookIdeaText();
-		System.out.println(Arrays.asList(lists));
-		if (lists.size() != 0) {
-			model.addAttribute("userIdea", lists);
-		}
-		return "/admin/lookfeedback";
-	}
+//	@RequestMapping(value = "/lookfeedback", method = RequestMethod.GET)
+//	public String lookUserIdeaText(Model model) {
+//
+//		List<User> lists = userInfoService.lookIdeaText();
+//		System.out.println(Arrays.asList(lists));
+//		if (lists.size() != 0) {
+//			model.addAttribute("userIdea", lists);
+//		}
+//		return "/admin/lookfeedback";
+//	}
 
 	@ResponseBody
 	@RequestMapping(value = "/changePwd", method = RequestMethod.PUT)
@@ -270,6 +293,27 @@ public class AdminController extends BaseController {
 			e.printStackTrace();
 		}
 		return i+"";
+	}
+	 
+	@RequestMapping(value = "/selectUserDetailById/{id}", method = RequestMethod.GET)
+	public String selectUserDetailById(@PathVariable("id") String id, HttpServletRequest request) {
+		User user=null;
+		try {
+			user = userInfoService.selectUserDetailById(id);
+			
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		request.setAttribute("user", user);
+		return "/admin/userInfoDetail";
+	}
+
+	@Override
+	public Class getClassType() {
+		// TODO Auto-generated method stub
+		return this.getClass();
 	}
 
 }

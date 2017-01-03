@@ -17,7 +17,8 @@ public class RedisUtil {
 						config.setMaxActive(1000);
 						config.setMaxIdle(10);
 						config.setMaxWait(100*1000);
-						pool_Master=new JedisPool(config, "127.0.0.1", 6379);
+						
+						pool_Master=new JedisPool(config, "127.0.0.1", 6379, 100*1000, "keertem1911");
 						
 					}
 				}
@@ -36,7 +37,7 @@ public class RedisUtil {
 					config.setMaxActive(10000);
 					config.setMaxIdle(10);
 					config.setMaxWait(100*1000);
-					pool_Slave=new JedisPool(config, "127.0.0.1", 6379);
+					pool_Slave=new JedisPool(config, "127.0.0.1", 6380, 100*1000, "keertem1911");
 					
 				}
 			}

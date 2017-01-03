@@ -1,12 +1,12 @@
 package com.yetthin.web.domain;
 
 public class StockOfGroup {
-	private String groupName;
-	private String userID;
-	private String initMoney;
-	private String strategyId;
-	private String indexCode;
-	private String stock;
+	private String groupName;//组合名称
+	private String userID;//用户Id
+	private String initMoney;// 初始资金
+	private String strategyId;// 策略id  0-4
+	private String indexCode;// 选择类别
+	private String stock;//  股票编码
 	private String ifOpen;
 	
 	public String getIfOpen() {

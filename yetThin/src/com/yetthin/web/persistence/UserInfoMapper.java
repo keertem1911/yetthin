@@ -3,34 +3,36 @@ package com.yetthin.web.persistence;
 import java.util.List;
 import java.util.Map;
 
-import com.yetthin.web.domain.UserInfo;
+import com.yetthin.web.domain.User;
+
+ 
 
 public interface UserInfoMapper {
     int deleteByPrimaryKey(String userId);
 
-    int insert(UserInfo record);
+    int insert(User record);
 
-    int insertSelective(UserInfo record);
+    int insertSelective(User record);
 
-    UserInfo selectByPrimaryKey(String userId);
+    User selectByPrimaryKey(String userId);
 
-    int updateByPrimaryKeySelective(UserInfo record);
+    int updateByPrimaryKeySelective(User record);
 
-    int updateByPrimaryKeyWithBLOBs(UserInfo record);
+    int updateByPrimaryKeyWithBLOBs(User record);
 
-    int updateByPrimaryKey(UserInfo record);
+    int updateByPrimaryKey(User record);
     
 
-    UserInfo selectByPhoneNumAndPassWord(UserInfo record);
-    List<UserInfo> getAllUser();
-    UserInfo selectByPhoneNum(String phoneNum);
-    UserInfo selectByEmail(String email);
+    User selectByPhoneNumAndPassWord(User record);
+    List<User> getAllUser();
+    User selectByPhoneNum(String phoneNum);
+    User selectByEmail(String email);
     
-    List<UserInfo> lookIdeaText();
+    List<User> lookIdeaText();
 
-	UserInfo selectByPhoneNumAndPassWord(Map<String, String> map);
+    User selectByPhoneNumAndPassWord(Map<String, String> map);
 	
-	UserInfo  findVerifyEmailByEmail(String email);
+    User  findVerifyEmailByEmail(String email);
 	
 	
 }

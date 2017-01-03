@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yetthin.web.domain.PhoneVersion;
 import com.yetthin.web.persistence.PhoneVersionMapper;
@@ -20,11 +22,11 @@ public class PhoneVersionServiceImp implements PhoneVersionService{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Exception.class)
 	@Override
 	public int save(PhoneVersion entity) throws Exception {
 		// TODO Auto-generated method stub
-		return phoneVersionMapper.insert(entity);
+		return phoneVersionMapper.insertSelective(entity);
 	}
 
 	@Override
@@ -32,20 +34,27 @@ public class PhoneVersionServiceImp implements PhoneVersionService{
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
+	
 	 
 
 	 
 	@Override
 	public List<PhoneVersion> getListAll() {
 		// TODO Auto-generated method stub
-		return null;
+		return phoneVersionMapper.getAll();
 	}
 
 	@Override
 	public int countByExample() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	@Transactional(propagation=Propagation.REQUIRED,rollbackFor=Exception.class)
+	@Override
+	public int update(PhoneVersion p) {
+		// TODO Auto-generated method stub
+		int i =phoneVersionMapper.updateByPrimaryKeySelective(p);
+		return i;
 	}
 
 }

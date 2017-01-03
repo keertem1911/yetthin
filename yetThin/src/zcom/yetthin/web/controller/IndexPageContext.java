@@ -20,6 +20,13 @@ public class IndexPageContext {
 	
 	@Resource
 	private IndexPageContextService IndexPageContextService;
+	/**
+	 * 收入推荐表
+	 * @param type 0 月收益 1 年收益 2 优选收益 3 总收益 
+	 * @param pageNum
+	 * @param pageSize
+	 * @return
+	 */
 	@ResponseBody
 	@RequestMapping(value="/incomeRecommendList",method=RequestMethod.POST,
 			produces={"application/json;charset=utf-8"})
@@ -51,7 +58,7 @@ public class IndexPageContext {
 			@RequestParam(value="pageSize")int pageSize,
 			@RequestParam(value="type")int type){
 		String json =null;
-		json =IndexPageContextService.getCurrentIncomeList(groupNameOrId, pageNum, pageSize, type);
+		json =IndexPageContextService.getCurrentIncomeList(groupNameOrId, type);
 		return "{ \"value\":"+json+"}";
 	}
 	@ResponseBody
@@ -93,9 +100,22 @@ public class IndexPageContext {
 			produces={"application/json;charset=utf-8"})
 	@ResponseBody
 	public String getSearchStockCode(@RequestParam(value="stockCode")String stockCode,
+			@RequestParam(value="limitNum")int limitNum,
+			@RequestParam(value="isSearch")boolean isSearch,
+			@RequestParam(value="master")boolean master){
+		String json= null;
+		 
+		json =IndexPageContextService.getStockBySearchLike(stockCode,limitNum,isSearch,master);
+		 
+		return json;
+	}
+	@RequestMapping(value="/searchStockCodeWithPrice",method=RequestMethod.POST,
+			produces={"application/json;charset=utf-8"})
+	@ResponseBody
+	public String searchStockCodeWithPrice(@RequestParam(value="stockCode")String stockCode,
 			@RequestParam(value="limitNum")int limitNum){
 		String json= null;
-		json =IndexPageContextService.getStockBySearchLike(stockCode,limitNum);
+		json =IndexPageContextService.searchStockCodeWithPrice(stockCode,limitNum);
 		return json;
 	}
 }

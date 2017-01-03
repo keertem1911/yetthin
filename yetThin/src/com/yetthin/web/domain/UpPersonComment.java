@@ -5,8 +5,16 @@ public class UpPersonComment {
 		private String repateContext;
 		private String userid;
 		private String repeateId;
-		 
+		private String commentId;
 		private String fromName;
+		
+		 
+		public String getCommentId() {
+			return commentId;
+		}
+		public void setCommentId(String commentId) {
+			this.commentId = commentId;
+		}
 		public String getName() {
 			return name;
 		}

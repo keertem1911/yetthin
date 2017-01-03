@@ -11,14 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-import com.yetthin.web.commit.RedisUtil;
 import com.yetthin.web.commit.ValueFormatUtil;
-
-import redis.clients.jedis.JedisPool;
 
 public class JHdboa implements ValueFormatUtil{
 	
-	private static JedisPool poolM=RedisUtil.getInstanceMsater();
 	
 	private List<TickSort> tickSorts=null;
 	

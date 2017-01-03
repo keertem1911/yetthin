@@ -1,6 +1,7 @@
 package com.yetthin.web.domain;
 
 public class RecommendList {
+	private String groupId;
 	private String groupName;
 	private String incomeRatio;
 	private int incomeType;
@@ -9,6 +10,13 @@ public class RecommendList {
 	private String recommendReason;
 	private int vipFlag;
 	private String createTime;
+	
+	public String getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
+	}
 	public String getGroupName() {
 		return groupName;
 	}

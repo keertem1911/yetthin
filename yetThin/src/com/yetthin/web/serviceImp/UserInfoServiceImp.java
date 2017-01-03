@@ -1,52 +1,61 @@
 package com.yetthin.web.serviceImp;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
+ 
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yetthin.web.commit.sendEmailVerify;
 import com.yetthin.web.domain.PhoneVersion;
-import com.yetthin.web.domain.UserInfo;
-import com.yetthin.web.persistence.UserInfoMapper;
+import com.yetthin.web.domain.User;
+ 
+import com.yetthin.web.persistence.UserMapper;
 import com.yetthin.web.service.UserInfoService;
 
 @Service("UserInfoService")
 public class UserInfoServiceImp extends BaseService implements UserInfoService{
 
-	@Autowired
-	private UserInfoMapper userInfoMapper;
-	
-	private SimpleDateFormat  sf=new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+
+	@Resource
+	private UserMapper userMapper;
 	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_UNCOMMITTED)
 	@Override
-	public UserInfo get(String id) {
+	public User get(String id) {
 		// TODO Auto-generated method stub
 	 
-		return userInfoMapper.selectByPrimaryKey(id);
+		return userMapper.selectByPrimaryKey(id);
 	}
+	 /**
+	  * 注册用户
+	  * @keerte
+	  */
 	 
-	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED)
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
 	@Override
-	public int save(UserInfo entity) throws Exception {
+	public int save(User entity)   {
 		// TODO Auto-generated method stub
 		System.out.println(entity+"===========================");
-		return userInfoMapper.insert(entity);
+		entity.setUserRegisterTime(LocalDateTime.now().format(simple));
+		return userMapper.insertSelective(entity);
 	}
-	@Transactional(propagation=Propagation.REQUIRES_NEW,isolation=Isolation.READ_COMMITTED)
+	
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class) 
 	@Override
 	public int delete(String id) throws Exception {
 		// TODO Auto-generated method stub
-		return userInfoMapper.deleteByPrimaryKey(id);
+		return userMapper.deleteByPrimaryKey(id);
 	}
 	
  
@@ -55,10 +64,12 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
 	@Override
-	public String forgetPwd(UserInfo userinfo) {
+	public String forgetPwd(User userinfo) {
 		// TODO Auto-generated method stub
-		int i=userInfoMapper.updateByPrimaryKey(userinfo);
+		int i=userMapper.updateByPrimaryKey(userinfo);
 		  
 		return		i==0?"506,添加失败":"200, ";
 	}
@@ -67,55 +78,56 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+//	@Override
+//	public String updateJpushId(String userId, String JpushID,String JpushType) {
+//		// TODO Auto-generated method stub
+//		String msg=null;
+//		String statusCode="200";
+//		User ui=userInfoMapper.selectByPrimaryKey(userId);
+//		if(ui==null){
+//			msg="用户不存在";
+//			statusCode="504";
+//			
+//		}else{
+//			ui.setJpushId(JpushID);
+//			ui.setJpushType(JpushType);
+//			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
+//			if(i==0){
+//				msg="更新失败";
+//				statusCode="506";
+//			}
+//		}
+//		return statusCode+"="+msg;
+//	}
+//	@Override
+//	public String updateJpushStatus(String userId, String jpushStatus,String JpushType) {
+//		// TODO Auto-generated method stub
+//		String statusCode="200";
+//		String msg=null;
+//		User ui=userInfoMapper.selectByPrimaryKey(userId);
+//		if(ui==null){
+//			msg="用户不存在";
+//			statusCode="504";
+//		}else{
+//		
+//			ui.setJpushStatus(Integer.parseInt(jpushStatus));
+//			ui.setJpushType(JpushType);
+//			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
+//			if(i==0){
+//				statusCode="506";
+//				msg="更新失败";
+//			}
+//		}
+//		return statusCode+"="+msg;
+//		 
+//	}
 	@Override
-	public String updateJpushId(String userId, String JpushID,String JpushType) {
-		// TODO Auto-generated method stub
-		String msg=null;
-		String statusCode="200";
-		UserInfo ui=userInfoMapper.selectByPrimaryKey(userId);
-		if(ui==null){
-			msg="用户不存在";
-			statusCode="504";
-			
-		}else{
-			ui.setJpushId(JpushID);
-			ui.setJpushType(JpushType);
-			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
-			if(i==0){
-				msg="更新失败";
-				statusCode="506";
-			}
-		}
-		return statusCode+"="+msg;
-	}
-	@Override
-	public String updateJpushStatus(String userId, String jpushStatus,String JpushType) {
+	public String bindingEmail(String userID, String email,String path) {
 		// TODO Auto-generated method stub
 		String statusCode="200";
 		String msg=null;
-		UserInfo ui=userInfoMapper.selectByPrimaryKey(userId);
-		if(ui==null){
-			msg="用户不存在";
-			statusCode="504";
-		}else{
-		
-			ui.setJpushStatus(Integer.parseInt(jpushStatus));
-			ui.setJpushType(JpushType);
-			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
-			if(i==0){
-				statusCode="506";
-				msg="更新失败";
-			}
-		}
-		return statusCode+"="+msg;
-		 
-	}
-	@Override
-	public String bindingEmail(String userID, String email) {
-		// TODO Auto-generated method stub
-		String statusCode="200";
-		String msg=null;
-		UserInfo ui=userInfoMapper.selectByPrimaryKey(userID);
+		 path=path.split("user/")[0];
+		User ui=userMapper.selectByPrimaryKey(userID);
 		if(ui==null){
 			msg="用户不存在";
 			statusCode="504";
@@ -123,14 +135,15 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		
 			ui.setEmail(email);
 			ui.setVerifyEmail(getEncrty(email));
-			String date1=simple.format(new Date(System.currentTimeMillis()+28800000));
-			ui.setRegisterTime(date1);
+			LocalDateTime time= LocalDateTime.now().plusHours(8);
+			String date1=time.format(simple);
+			ui.setUserRegisterTime(date1);
 			ui.setEmailStatus("0");
-			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
+			int i=userMapper.updateByPrimaryKeySelective(ui);
 			StringBuffer sb=new StringBuffer();
 			sb.append("<html><head></head><body><h2>复制下面链接到浏览器激活账号，8小时生效，否则重新注册账号</h2><br/>");
 		//	sb.append("                        <a href=\""+EMAIL_CALLBACK_ADDRESS+"?email="+email+"&verifyEmail="+getEncrty(email)+"\">");
-			sb.append(""+EMAIL_CALLBACK_ADDRESS+"?email="+email+"&verifyEmail="+getEncrty(email));
+			sb.append(""+path+"user/emailCallback?email="+email+"&verifyEmail="+getEncrty(email));
 
 		//	sb.append("</a>");
 			sb.append("</body></htmk>");
@@ -146,9 +159,9 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		return statusCode+"="+msg;
 	}
 	@Override
-	public String changePwd(UserInfo u) {
+	public String changePwd(User u) {
 		// TODO Auto-generated method stub
-		int i=userInfoMapper.updateByPrimaryKey(u);
+		int i=userMapper.updateByPrimaryKey(u);
 		return i==0?"更新失败":"200";
 	}
 	@Override
@@ -156,19 +169,21 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
 	@Override
 	public String feedBack(String userId, String ideaText) {
 		// TODO Auto-generated method stub
 		String statusCode="200";
 		String msg=null;
-		UserInfo ui=userInfoMapper.selectByPrimaryKey(userId);
+		User ui=userMapper.selectByPrimaryKey(userId);
 		if(ui==null){
 			msg="用户不存在";
 			statusCode="504";
 		}else{
 		
 			ui.setIdeaText(ideaText);
-			int i=userInfoMapper.updateByPrimaryKeySelective(ui);
+			int i=userMapper.updateByPrimaryKeySelective(ui);
 			if(i==0){
 				msg="更新失败";
 				statusCode="506";
@@ -178,9 +193,9 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		 
 	}
 	@Override
-	public List<UserInfo> getListAll() {
+	public List<User> getListAll() {
 		// TODO Auto-generated method stub
-		return userInfoMapper.getAllUser();
+		return userMapper.getAllUser();
 	}
 	@Override
 	public int countByExample() {
@@ -188,28 +203,28 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		return 0;
 	}
 	@Override
-	public UserInfo selectByPhoneNum(String phoneNum) {
+	public User selectByPhoneNum(String phoneNum) {
 		// TODO Auto-generated method stub
-		return userInfoMapper.selectByPhoneNum(phoneNum);
+		return userMapper.selectByPhoneNum(phoneNum);
 	}
+//	@Override
+//	public User selectByEmail(String email) {
+//		// TODO Auto-generated method stub
+//		return userInfoMapper.selectByEmail(email);
+//	}
+//	@Override
+//	public List<User> lookIdeaText() {
+//		// TODO Auto-generated method stub
+//		return userInfoMapper.lookIdeaText();
+//	}
 	@Override
-	public UserInfo selectByEmail(String email) {
-		// TODO Auto-generated method stub
-		return userInfoMapper.selectByEmail(email);
-	}
-	@Override
-	public List<UserInfo> lookIdeaText() {
-		// TODO Auto-generated method stub
-		return userInfoMapper.lookIdeaText();
-	}
-	@Override
-	public UserInfo getByPhoneAndPassword(String phone, String password) {
+	public User getByPhoneAndPassword(String phone, String password) {
 		// TODO Auto-generated method stub
 		Map<String, String> map=new HashMap<>();
 		map.put("phone", phone);
 		map.put("password", password);
-		UserInfo ui=userInfoMapper.selectByPhoneNumAndPassWord(map);
-		return null;
+		User ui=userMapper.selectByPhoneNumAndPassWord(map);
+		return ui;
 	}
 	
 	public int sendEmailVerifyService(String to){
@@ -217,27 +232,33 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 			getSender().sendEmail(to, "邮件验证", "");
 			return i;
 	}
-
+	/**
+	 * 邮箱验证
+	 */
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
 	@Override
 	public String checkEmailVerify(String email, String verifyCode)  {
 		// TODO Auto-generated method stub
 		String error="";
-		UserInfo user= userInfoMapper.findVerifyEmailByEmail(email);
+		User user= userMapper.findVerifyEmailByEmail(email);
 		 if(user!=null){
-			 	Date date= new Date();
-			 	Date date2=null;
+//			 	Date date= new Date();
+			 	LocalDateTime date=LocalDateTime.now();
+//			 	Date date2=null;
+			 	LocalDateTime date2=null;
 			 	try {
-					date2=simple.parse(user.getRegisterTime());
-				} catch (ParseException e) {
+					date2=LocalDateTime.parse(user.getUserRegisterTime(), simple);
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			 	if(date.before(date2)){
+			 	if(Duration.between(date2, date).getSeconds()>0){
 			 		if(user.getVerifyEmail().equals(verifyCode.trim())){
 			 			System.out.println("激活成功！！！");
-			 			user.setRegisterTime(simple.format(new Date(System.currentTimeMillis())));
+			 			user.setUserRegisterTime(date.format(simple));
 			 			user.setEmailStatus("1");
-			 			userInfoMapper.updateByPrimaryKeySelective(user);
+			 			userMapper.updateByPrimaryKeySelective(user);
 			 			error="200";
 			 		}else{
 			 			error="验证信息错误";
@@ -250,30 +271,32 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		 }
 		return error;
 	}
-
+	
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
 	@Override
 	public String changePhoneNum(String userId, String newphoneNum, String password) {
 		// TODO Auto-generated method stub
 		String statusCode="200";
 		String msg="200";
-		UserInfo user=userInfoMapper.selectByPrimaryKey(userId);
+		User user=userMapper.selectByPrimaryKey(userId);
 		if(user!=null){
 			boolean same=false;
-			List<UserInfo> lists=userInfoMapper.getAllUser();
-			for (UserInfo userInfo : lists) {
-				if(newphoneNum.equals(userInfo.getPhoneNum())){
+			List<User> lists=userMapper.getAllUser();
+			for (User userInfo : lists) {
+				if(newphoneNum.equals(userInfo.getUserPhone())){
 					same=true;
 					break;
 				}
 			}
 			if(!same){
-			String phoneOld=user.getPhoneNum();
+			String phoneOld=user.getUserPhone();
 			String passwordt=getEncrty(phoneOld+","+password);
-			if(passwordt.trim().equals(user.getPassword())){
-					user.setPhoneNum(newphoneNum);
-					user.setPassword(getEncrty(newphoneNum+","+password));
+			if(passwordt.trim().equals(user.getUserPassword())){
+					user.setUserPhone(newphoneNum);
+					user.setUserPassword(getEncrty(newphoneNum+","+password));
 					System.out.println(user);
-					int i =userInfoMapper.updateByPrimaryKey(user);
+					int i =userMapper.updateByPrimaryKey(user);
 					if(i==0){
 						statusCode="506";
 					 	msg=",更新失败";
@@ -296,4 +319,72 @@ public class UserInfoServiceImp extends BaseService implements UserInfoService{
 		
 		return statusCode+msg;
 	}
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
+	@Override
+	public String updateJpushId(String userId, String JpushID,String JpushType) {
+		// TODO Auto-generated method stub
+		String msg=null;
+		String statusCode="200";
+		User ui=userMapper.selectByPrimaryKey(userId);
+		if(ui==null){
+			msg="用户不存在";
+			statusCode="504";
+			
+		}else{
+			ui.setJpushId(JpushID);
+			ui.setJpushType(JpushType);
+			int i=userMapper.updateByPrimaryKeySelective(ui);
+			if(i==0){
+				msg="更新失败";
+				statusCode="506";
+			}
+		}
+		return statusCode+"="+msg;
+	}
+	@Transactional(propagation=Propagation.REQUIRED,isolation=Isolation.READ_COMMITTED,
+			rollbackFor=Exception.class)
+	@Override
+	public String updateJpushStatus(String userId, String jpushStatus,String JpushType) {
+		// TODO Auto-generated method stub
+		String statusCode="200";
+		String msg=null;
+		User ui=userMapper.selectByPrimaryKey(userId);
+		if(ui==null){
+			msg="用户不存在";
+			statusCode="504";
+		}else{
+		
+			ui.setJpushStatus(Integer.parseInt(jpushStatus));
+			ui.setJpushType(JpushType);
+			int i=userMapper.updateByPrimaryKeySelective(ui);
+			if(i==0){
+				statusCode="506";
+				msg="更新失败";
+			}
+		}
+		return statusCode+"="+msg;
+		 
+	}
+	
+	 
+ 
+	 
+	@Override
+	public List<User> lookIdeaText() {
+		// TODO Auto-generated method stub
+		return userMapper.lookIdeaText();
+	}
+	@Override
+	public User selectUserDetailById(String userId) {
+		// TODO Auto-generated method stub
+		return userMapper.selectByPrimaryKey(userId);
+	}
+	@Override
+	public int updateUser(User user) {
+		return userMapper.updateByPrimaryKeySelective(user);
+	
+	}
+	 
+	 
 }

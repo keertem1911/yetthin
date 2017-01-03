@@ -1,13 +1,39 @@
 package com.yetthin.test;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import net.sf.json.JSONObject;
 
 public class JsonTest {
 
 	public static void main(String[] args) {
-		String s="{\'value\':{'groupName':'新能源汽车','emotionIndex':'75','totleIncome':'87.53','evaluateLevel':'中','dayIncome':'0.21','monthIncome':'1.22','netIncome':'1.55','userImg':'http://222.24.62.77:8080/yetThin/image/user-w23w2dqwer12.jpg','userName':'王德胜','userId':'w23w2dqwer12','vipFlag':'1','belongDepart':'前景私募有限公司','near3MonthIncome':'112.3','latestChangeShareTime':'2015-01-21'}}";
-		JSONObject json =JSONObject.fromObject(s);
-		System.out.println(json.getString("value"));
-		
+		// TODO Auto-generated method stub
+// 				String stocklableCode="A111.SZ";
+//				String stock = stocklableCode.split("[.]")[0];
+//				String [] arays = stock.split("");
+//				for (int i =0;i<arays.length;++i) {
+//					char ch=arays[i].toLowerCase().toCharArray()[0];
+//					if(ch<'0'||ch>'9'){
+//						arays[i]=Integer.toString((ch+'a')); 
+//					}
+//				}
+//				stocklableCode = Stream.of(arays).collect(Collectors.joining());
+//		 
+//		Calendar cal = Calendar.getInstance();
+//		System.out.println(cal.get(Calendar.DAY_OF_WEEK));
+//		LocalDate endDate= LocalDate.now();
+//		LocalDate beginDate= endDate.minusMonths(1);
+//		System.out.println(beginDate+" "+endDate);
+		LocalDate data1= LocalDate.of(2016, 10, 1);
+		LocalDate data2= LocalDate.of(2016, 12, 19);
+		Period p= Period.between(data1, data2);
+		System.out.println(p.getDays());
 	}
 }

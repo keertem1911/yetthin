@@ -1,5 +1,7 @@
 package com.yetthin.web.persistence;
 
+import java.util.List;
+
 import com.yetthin.web.domain.PhoneVersion;
 
 public interface PhoneVersionMapper {
@@ -14,4 +16,6 @@ public interface PhoneVersionMapper {
     int updateByPrimaryKeySelective(PhoneVersion record);
 
     int updateByPrimaryKey(PhoneVersion record);
+
+	List<PhoneVersion> getAll();
 }

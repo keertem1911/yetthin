@@ -13,15 +13,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.yetthin.web.commit.JtdoaValueMarket;
 import com.yetthin.web.commit.QQMarketLevelUtilByMaster;
 import com.yetthin.web.commit.RedisUtil;
 import com.yetthin.web.commit.ValueFormatUtil;
-import com.yetthin.web.domain.barData;
-import com.yetthin.web.persistence.barDataMapper;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -39,16 +36,17 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 	private static JedisPool poolM=RedisUtil.getInstanceMsater();
 	
 	private static JedisPool poolS=RedisUtil.getInstanceSlave();
-	
-	@Autowired 
-	private barDataMapper barDataMapper;
+	private static String auth="keertem1911";
+	 
 	
 	private static Jedis jedis_M=null;
 	private static Jedis jedis_S=null;
 	static{
 		 
 		jedis_S=poolS.getResource();
+		jedis_S.auth(auth);
 		jedis_M=poolM.getResource();
+		jedis_M.auth(auth);
 	}
 	private  String joinStringSplit(String [] array,String sp){
 		StringBuffer buffer=new StringBuffer();
@@ -103,21 +101,21 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 	 * @param L1Value
 	 */
 	private void saveSortBalance(String symbol,String exchange,String L1Value,String openValue,String date){
-//		jedis_M.select(1);
-//		
-//		double l1Val=Double.parseDouble(L1Value);
-//		double openVal=Double.parseDouble(openValue);
-//		double desc =(l1Val-openVal)/openVal;
-//		int marketName=0;
-//		if("SZ".equals(exchange.toUpperCase().trim())||"SH".equals(exchange.toUpperCase().trim())){
-//			marketName=HU_SHEN;
-//		}
-//		if(desc>0)
-//			jedis_M.zadd(MARKET[marketName][0]+":"+MARKET[marketName][1],desc,symbol+"."+exchange.toUpperCase()+":"+l1Val+":"+date);
-//		else 
-//			jedis_M.zadd(MARKET[marketName][0]+":"+MARKET[marketName][2],desc,symbol+"."+exchange.toUpperCase()+":"+l1Val+":"+l1Val+":"+date);
-//		
-//		jedis_M.select(0);
+		jedis_M.select(1);
+		
+		double l1Val=Double.parseDouble(L1Value);
+		double openVal=Double.parseDouble(openValue);
+		double desc =(l1Val-openVal)/openVal;
+		int marketName=0;
+		if("SZ".equals(exchange.toUpperCase().trim())||"SH".equals(exchange.toUpperCase().trim())){
+			marketName=HU_SHEN;
+		}
+		if(desc>0)
+			jedis_M.zadd(MARKET[marketName][0]+":"+MARKET[marketName][1],desc,symbol+"."+exchange.toUpperCase()+":"+l1Val+":"+date);
+		else 
+			jedis_M.zadd(MARKET[marketName][0]+":"+MARKET[marketName][2],desc,symbol+"."+exchange.toUpperCase()+":"+l1Val+":"+l1Val+":"+date);
+		
+		jedis_M.select(0);
 		
 	}
 	/**
@@ -132,7 +130,7 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 	 * @param L1Value 类型对应的值
 	 * @param size 大小
 	 */
-	public void Level1Data(long tickId, String symbol,String secType,String exchange,String currency,int tickType,String L1Value, int size){
+//	public void Level1Data(long tickId, String symbol,String secType,String exchange,String currency,int tickType,String L1Value, int size){
 		/*jedis_M.select(0);
 		String value=jedis_M.get(symbol+"."+exchange);
 		String [] subStr=value.split(SPLIT_STR);
@@ -201,7 +199,7 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 		System.out.println("save succes "+value );
 		jedis_M.set(symbol+"."+exchange, value);*/
 	 
-	}
+//	}
 	/**
 	 * 获取指数字符串
 	 * @param huShen 市场编号 
@@ -248,7 +246,7 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 	 * @return
 	 */
 	public Map<String, List<String>> getL1StockMarketData(int huShen,long begin,long end,
-			String[] params,boolean master) {
+			String[] params ) {
 		// TODO Auto-generated method stub
 		Map<String, List<String>> map=new HashMap<>();
 //		jedis_M.select(1);
@@ -274,7 +272,7 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 				Set<Tuple> range=null;
 				switch(index){
 				case 0:
-					range=jedis_S.zrevrangeWithScores(string, begin,end);
+					range=jedis_S.zrevrangeWithScores(string, begin,end); 
 					break;
 				case 1:
 					range=jedis_S.zrangeWithScores(string, begin,end); 
@@ -709,21 +707,21 @@ public class JtdoaDao implements ValueFormatUtil,JtdoaValueMarket,QQMarketLevelU
 	/**
 	 * 获取指数集合
 	 */
-	public List<barData> getStockIndex(String begin,String end,String time,String size){
-		Map<String, String> map =new HashMap<>();
-		map.put("begin", begin);
-		map.put("end", end);
-		map.put("time", time);
-		map.put("size", size);
-		List<barData> lists= barDataMapper.getBetweenBeginAndEnd(map);
-		return lists;
-	}
-	/**
-	 * 获取单支股票的详细 日线值
-	 * 
-	 */
-	public List<barData> getStockIndustryDK(Map map){
-		List<barData> lists =barDataMapper.selectByPrimaryKey(map);
-		return lists;
-	}
+//	public List<barData> getStockIndex(String begin,String end,String time,String size){
+//		Map<String, String> map =new HashMap<>();
+//		map.put("begin", begin);
+//		map.put("end", end);
+//		map.put("time", time);
+//		map.put("size", size);
+//		List<barData> lists= barDataMapper.getBetweenBeginAndEnd(map);
+//		return lists;
+//	}
+//	/**
+//	 * 获取单支股票的详细 日线值
+//	 * 
+//	 */
+//	public List<barData> getStockIndustryDK(Map map){
+//		List<barData> lists =barDataMapper.selectByPrimaryKey(map);
+//		return lists;
+//	}
 }

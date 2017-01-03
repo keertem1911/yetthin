@@ -1,5 +1,300 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yetthin.web.persistence.GroupMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.Group" >
+    <id column="group_id" property="groupId" jdbcType="VARCHAR" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="group_create_id" property="groupCreateId" jdbcType="VARCHAR" />
+    <result column="group_create_time" property="groupCreateTime" jdbcType="VARCHAR" />
+    <result column="group_init_money" property="groupInitMoney" jdbcType="DOUBLE" />
+    <result column="group_evaluate_level" property="groupEvaluateLevel" jdbcType="CHAR" />
+    <result column="group_income_totle" property="groupIncomeTotle" jdbcType="DOUBLE" />
+    <result column="group_strategy_id" property="groupStrategyId" jdbcType="VARCHAR" />
+    <result column="group_refer_index" property="groupReferIndex" jdbcType="VARCHAR" />
+    <result column="group_emotion_index" property="groupEmotionIndex" jdbcType="INTEGER" />
+    <result column="group_warning_level" property="groupWarningLevel" jdbcType="INTEGER" />
+    <result column="group_media_attention_rate" property="groupMediaAttentionRate" jdbcType="INTEGER" />
+    <result column="group_open" property="groupOpen" jdbcType="VARCHAR" />
+    
+    <result column="group_netizen_attention_rate" property="groupNetizenAttentionRate" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="BaseResultMapSimple" type="com.yetthin.web.domain.UserGroups" >
+    <id column="group_id" property="groupId" jdbcType="VARCHAR" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="group_create_time" property="createTime" jdbcType="VARCHAR" />
+    <result column="group_income_totle" property="imcomeRatio" jdbcType="VARCHAR" />
+     
+    <result column="group_init_money" property="groupInitMoney" jdbcType="DOUBLE" />
+  </resultMap>
+   
+  <resultMap  id="BaseDetail"  type="com.yetthin.web.domain.GroupDetail" >
+  	 <id column="group_id" property="groupId" jdbcType="VARCHAR" />
+    <result column="group_name" property="groupName" jdbcType="VARCHAR" />
+    <result column="group_create_id" property="groupCreateId" jdbcType="VARCHAR" />
+    <result column="group_init_money" property="groupInitMoney" jdbcType="DOUBLE" />
+    <result column="group_evaluate_level" property="evaluateLevel" jdbcType="CHAR" />
+    <result column="group_income_totle" property="totleIncome" jdbcType="VARCHAR" />
+  	
+  </resultMap>
+   <resultMap id="HeroIncomeMap" type="com.yetthin.web.domain.HeroIncome" >
+    <id column="user_id" property="userId" jdbcType="VARCHAR" />
+    <result column="user_name" property="userName" jdbcType="VARCHAR" />
+    <result column="user_vip_flag" property="vipFlag" jdbcType="VARCHAR" />
+    <result column="radio" property="near3MonthIncome" jdbcType="DOUBLE" />
+    <result column="user_head_pic" property="userImg" jdbcType="VARCHAR" />
+    <result column="user_firm" property="belongDepart" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Hero_Column_List">
+  	user_id ,user_name, user_vip_flag ,user_head_pic,user_firm
+  </sql>
+  <sql id="Base_Column_List" >
+    group_id, group_name, group_create_id, group_create_time, group_init_money, group_evaluate_level, 
+    group_income_totle, group_strategy_id, group_refer_index, group_emotion_index, group_warning_level, 
+    group_media_attention_rate, group_netizen_attention_rate,group_open
+  </sql>
+  <sql id="Base_Column_simple">
+  group_id, group_name, group_create_id, group_create_time,group_init_money,group_income_totle
+  </sql>
+  <select id="selectByPrimaryKeySimple" resultMap="BaseResultMapSimple" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_simple" />
+    from tb_group
+    <where>
+    <if test="userId !=null">
+    group_create_id = #{userId,jdbcType=VARCHAR}
+     </if>
+   </where>
+   order by group_income_totle/group_init_money desc
+    limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER} 
+    
+  </select>
+  <select id="selectByGroupIds" resultMap="BaseResultMapSimple" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_simple" />
+    from tb_group
+    where
+    group_id in
+    <foreach collection="list" item="item" open="(" close=")" separator=",">
+   		#{item,jdbcType=VARCHAR} 
+    </foreach>
+   order by group_income_totle/group_init_money desc
+    limit #{begin,jdbcType=INTEGER},#{end,jdbcType=INTEGER} 
+    
+  </select>
+  <select id="selectByHeroIncome" parameterType="java.util.Map" resultMap="HeroIncomeMap">
+  select <include refid="Hero_Column_List"></include>
+  ,(sum(group_income_totle)-sum(group_init_money))/sum(group_init_money) radio
+  from tb_group ,tb_user 
+  where user_id=group_create_id group by group_create_id  order by radio desc
+  limit #{begin,jdbcType=VARCHAR},#{end,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_group
+    where group_id = #{group_id,jdbcType=VARCHAR}
+  	limit 1
+  </select>
+  <select id="selectGroupsAll" resultMap="BaseResultMap">
+   	select 
+    <include refid="Base_Column_List" />
+    from tb_group
+  
+  </select>
+   <select id="selectGroupByUserId" parameterType="java.util.Map" resultMap="BaseResultMap">
+   	 select 
+    <include refid="Base_Column_List" />
+    from tb_group
+    where group_id = #{groupId,jdbcType=VARCHAR}
+    and group_create_id =#{userId,jdbcType=VARCHAR}
+  	limit 1
+   </select>
+     <select id="selectByUserId" parameterType="string" resultMap="BaseResultMap">
+   	 select 
+    <include refid="Base_Column_List" />
+    from tb_group
+    where 
+    group_create_id =#{userId,jdbcType=VARCHAR}
+  	
+   </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_group
+    where group_id = #{groupId,jdbcType=VARCHAR}
+  </delete>
+  	<select id="getTotlePageUserGroups" parameterType="java.lang.String" resultType="java.lang.Integer">
+  		select count(*) from tb_group 
+	<where>
  
+	 group_create_id =#{userId,jdbcType=VARCHAR}
+  	</where>
+  	  
+  	</select>
+  		<select id="getTotlePageUserAll"  resultType="java.lang.Integer">
+  		select count(*) from tb_group 
+	 
+  	</select>
+  <insert id="insert" parameterType="com.yetthin.web.domain.Group" >
+    
+    insert into tb_group (group_id, group_name, group_create_id, 
+      group_create_time, group_init_money, group_evaluate_level, 
+      group_income_totle, group_strategy_id, group_refer_index, 
+      group_emotion_index, group_warning_level, group_media_attention_rate, 
+      group_netizen_attention_rate,group_open)
+    values (#{groupId,jdbcType=VARCHAR}, #{groupName,jdbcType=VARCHAR}, #{groupCreateId,jdbcType=VARCHAR}, 
+      #{groupCreateTime,jdbcType=VARCHAR}, #{groupInitMoney,jdbcType=DOUBLE}, #{groupEvaluateLevel,jdbcType=CHAR}, 
+      #{groupIncomeTotle,jdbcType=DOUBLE}, #{groupStrategyId,jdbcType=VARCHAR}, #{groupReferIndex,jdbcType=VARCHAR}, 
+      #{groupEmotionIndex,jdbcType=INTEGER}, #{groupWarningLevel,jdbcType=INTEGER}, #{groupMediaAttentionRate,jdbcType=INTEGER}, 
+      #{groupNetizenAttentionRate,jdbcType=INTEGER},#{groupOpen,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.Group" >
+     
+    insert into tb_group
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      group_id,
+      <if test="groupName != null" >
+        group_name,
+      </if>
+      <if test="groupCreateId != null" >
+        group_create_id,
+      </if>
+      <if test="groupCreateTime != null" >
+        group_create_time,
+      </if>
+      <if test="groupInitMoney != null" >
+        group_init_money,
+      </if>
+      <if test="groupEvaluateLevel != null" >
+        group_evaluate_level,
+      </if>
+      <if test="groupIncomeTotle != null" >
+        group_income_totle,
+      </if>
+      <if test="groupStrategyId != null" >
+        group_strategy_id,
+      </if>
+      <if test="groupReferIndex != null" >
+        group_refer_index,
+      </if>
+      <if test="groupEmotionIndex != null" >
+        group_emotion_index,
+      </if>
+      <if test="groupWarningLevel != null" >
+        group_warning_level,
+      </if>
+      <if test="groupMediaAttentionRate != null" >
+        group_media_attention_rate,
+      </if>
+      <if test="groupNetizenAttentionRate != null" >
+        group_netizen_attention_rate,
+      </if>
+      <if test="groupOpen != null" >
+        group_open,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{groupId,jdbcType=VARCHAR},
+      <if test="groupName != null" >
+        #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupCreateId != null" >
+        #{groupCreateId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupCreateTime != null" >
+        #{groupCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="groupInitMoney != null" >
+        #{groupInitMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="groupEvaluateLevel != null" >
+        #{groupEvaluateLevel,jdbcType=CHAR},
+      </if>
+      <if test="groupIncomeTotle != null" >
+        #{groupIncomeTotle,jdbcType=DOUBLE},
+      </if>
+      <if test="groupStrategyId != null" >
+        #{groupStrategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupReferIndex != null" >
+        #{groupReferIndex,jdbcType=VARCHAR},
+      </if>
+      <if test="groupEmotionIndex != null" >
+        #{groupEmotionIndex,jdbcType=INTEGER},
+      </if>
+      <if test="groupWarningLevel != null" >
+        #{groupWarningLevel,jdbcType=INTEGER},
+      </if>
+      <if test="groupMediaAttentionRate != null" >
+        #{groupMediaAttentionRate,jdbcType=INTEGER},
+      </if>
+      <if test="groupNetizenAttentionRate != null" >
+        #{groupNetizenAttentionRate,jdbcType=INTEGER},
+      </if>
+      <if test="groupOpen != null" >
+        #{groupOpen,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.Group" >
+    update tb_group
+    <set >
+      <if test="groupName != null" >
+        group_name = #{groupName,jdbcType=VARCHAR},
+      </if>
+      <if test="groupCreateId != null" >
+        group_create_id = #{groupCreateId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupCreateTime != null" >
+        group_create_time = #{groupCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="groupInitMoney != null" >
+        group_init_money = #{groupInitMoney,jdbcType=DOUBLE},
+      </if>
+      <if test="groupEvaluateLevel != null" >
+        group_evaluate_level = #{groupEvaluateLevel,jdbcType=CHAR},
+      </if>
+      <if test="groupIncomeTotle != null" >
+        group_income_totle = #{groupIncomeTotle,jdbcType=DOUBLE},
+      </if>
+      <if test="groupStrategyId != null" >
+        group_strategy_id = #{groupStrategyId,jdbcType=VARCHAR},
+      </if>
+      <if test="groupReferIndex != null" >
+        group_refer_index = #{groupReferIndex,jdbcType=VARCHAR},
+      </if>
+      <if test="groupEmotionIndex != null" >
+        group_emotion_index = #{groupEmotionIndex,jdbcType=INTEGER},
+      </if>
+      <if test="groupWarningLevel != null" >
+        group_warning_level = #{groupWarningLevel,jdbcType=INTEGER},
+      </if>
+      <if test="groupMediaAttentionRate != null" >
+        group_media_attention_rate = #{groupMediaAttentionRate,jdbcType=INTEGER},
+      </if>
+      <if test="groupNetizenAttentionRate != null" >
+        group_netizen_attention_rate = #{groupNetizenAttentionRate,jdbcType=INTEGER},
+      </if>
+      <if test="groupOpen != null" >
+        group_open = #{groupOpen,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where group_id = #{groupId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.Group" >
+    update tb_group
+    set group_name = #{groupName,jdbcType=VARCHAR},
+      group_create_id = #{groupCreateId,jdbcType=VARCHAR},
+      group_create_time = #{groupCreateTime,jdbcType=VARCHAR},
+      group_init_money = #{groupInitMoney,jdbcType=DOUBLE},
+      group_evaluate_level = #{groupEvaluateLevel,jdbcType=CHAR},
+      group_income_totle = #{groupIncomeTotle,jdbcType=DOUBLE},
+      group_strategy_id = #{groupStrategyId,jdbcType=VARCHAR},
+      group_refer_index = #{groupReferIndex,jdbcType=VARCHAR},
+      group_emotion_index = #{groupEmotionIndex,jdbcType=INTEGER},
+      group_warning_level = #{groupWarningLevel,jdbcType=INTEGER},
+      group_media_attention_rate = #{groupMediaAttentionRate,jdbcType=INTEGER},
+      group_netizen_attention_rate = #{groupNetizenAttentionRate,jdbcType=INTEGER}
+      group_open = #{groupOpen,jdbcType=VARCHAR},
+    where group_id = #{groupId,jdbcType=VARCHAR}
+  </update>
 </mapper>

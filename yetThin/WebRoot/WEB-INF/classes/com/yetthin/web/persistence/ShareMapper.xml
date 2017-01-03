@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.ShareMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.Share" >
+    <id column="share_id" property="shareId" jdbcType="VARCHAR" />
+    <result column="share_group_id" property="shareGroupId" jdbcType="VARCHAR" />
+    <result column="share_stocklable_id" property="shareStocklableId" jdbcType="VARCHAR" />
+    <result column="share_start_fund" property="shareStartFund" jdbcType="DOUBLE" />
+    <result column="share_current_num" property="shareCurrentNum" jdbcType="DOUBLE" />
+    <result column="share_current_income" property="shareCurrentIncome" jdbcType="DOUBLE" />
+    <result column="share_stocklable_name" property="shareStocklableName" jdbcType="VARCHAR" />
+ 
+  </resultMap>
+  <resultMap id="BaseResultIndustry" type="com.yetthin.web.domain.Share" >
+   <!--  <id column="share_id" property="shareId" jdbcType="VARCHAR" />
+    --> 
+    <result column="share_stocklable_id" property="shareStocklableId" jdbcType="VARCHAR" />
+  	 <result column="stocklable_trade" property="shareGroupId" jdbcType="VARCHAR" /> 
+    <result column= "stocklable_type" property="shareId" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    share_id, share_group_id, share_stocklable_id, share_start_fund, share_current_num, 
+    share_current_income,share_stocklable_name
+  </sql>
+  <sql id="sql1">share_status='1'</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_share
+    where share_id = #{shareId,jdbcType=VARCHAR} and share_status='1'
+  </select>
+  <select id="selectSharesAll" resultMap="BaseResultMap"   >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_share where share_status='1'
+    
+  </select>
+  <select id="countSumStartFundByGroupId" resultType="java.lang.Long" parameterType="java.lang.String"   >
+    select sum(share_start_fund)
+    from tb_share where share_group_id=#{groupId,jdbcType=VARCHAR} and <include refid="sql1"></include>
+    
+  </select>
+  <select id="selectSumFundByGroupId" parameterType="java.lang.String" resultType="java.util.HashMap" >
+  select sum(share_start_fund) as start_fund ,sum(share_current_income) as current_income
+		from tb_share s where s.share_group_id=#{groupId,jdbcType=VARCHAR}
+		and <include refid="sql1"></include>
+  </select>
+   
+  <select id="selectDeletedShare" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    , stocklable_name
+    from tb_share, tb_stocklable
+    where share_group_id = #{groupId,jdbcType=VARCHAR} and stocklable_code=share_stocklable_id
+    and share_status='0'
+  </select>
+   
+  <select id="selectByGroupIdList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    , stocklable_name
+    from tb_share, tb_stocklable
+    where share_group_id = #{groupId,jdbcType=VARCHAR} and stocklable_code=share_stocklable_id
+    and <include refid="sql1"></include>
+  </select>
+  <select id="selectAllShareByGroupIdList" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    , stocklable_name
+    from tb_share, tb_stocklable
+    where share_group_id = #{groupId,jdbcType=VARCHAR} and stocklable_code=share_stocklable_id
+     
+  </select>
+  
+  <select id="selectByGroupIdOne" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    , stocklable_name
+    from tb_share, tb_stocklable
+    where share_group_id = #{groupId,jdbcType=VARCHAR} and stocklable_code=share_stocklable_id
+    and <include refid="sql1"></include> limit 1
+  </select>
+  <select id="selectIndustry" resultMap="BaseResultIndustry" parameterType="java.lang.String" >
+    select 
+    share_stocklable_id,stocklable_trade,stocklable_type
+    from tb_share,tb_stocklable
+    where share_group_id = #{group_id,jdbcType=VARCHAR} and 
+    share_stocklable_id= stocklable_code and <include refid="sql1"></include>
+  </select>
+  
+  <delete id="deleteByGroupId" parameterType="java.lang.String">
+  	delete from tb_share where share_group_id = #{groupId,jdbcType=VARCHAR}  
+  </delete>
+ 
+  <update id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    update tb_share set share_status='0'
+    where share_id = #{shareId,jdbcType=VARCHAR} 
+  </update>
+     <update id="updateDeleteStatus" parameterType="java.lang.String" >
+    update tb_share set share_status='0'
+    where share_group_id = #{groupId,jdbcType=VARCHAR} 
+  </update> 
+     <update id="updateShareStatusToAble" parameterType="java.lang.String" >
+    update tb_share set share_status='1'
+    where share_id = #{shareId,jdbcType=VARCHAR} 
+  </update> 
+  
+  <insert id="insert" parameterType="java.util.List" >
+    
+    insert into tb_share (share_id, share_group_id, share_stocklable_id, 
+      share_start_fund, share_current_num, share_current_income,share_stocklable_name,share_status
+      )
+    values 
+    <foreach collection="list" open="(" close=")" separator="),(" item="item" index="index">
+    #{item.shareId,jdbcType=VARCHAR},#{item.shareGroupId,jdbcType=VARCHAR}, #{item.shareStocklableId,jdbcType=VARCHAR}, 
+     #{item.shareStartFund,jdbcType=DOUBLE}, #{item.shareCurrentNum,jdbcType=DOUBLE}, #{item.shareCurrentIncome,jdbcType=DOUBLE},
+     #{item.shareStocklableName,jdbcType=VARCHAR},'1'
+      </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.Share" >
+    <selectKey resultType="java.lang.String" keyProperty="shareId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_share
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      share_id,
+      <if test="shareGroupId != null" >
+        share_group_id,
+      </if>
+      <if test="shareStocklableId != null" >
+        share_stocklable_id,
+      </if>
+      <if test="shareStartFund != null" >
+        share_start_fund,
+      </if>
+      <if test="shareCurrentNum != null" >
+        share_current_num,
+      </if>
+      <if test="shareCurrentIncome != null" >
+        share_current_income,
+      </if>
+      <if test="shareStocklableName != null" >
+        share_stocklable_name,
+      </if>
+      share_status
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{shareId,jdbcType=VARCHAR},
+      <if test="shareGroupId != null" >
+        #{shareGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="shareStocklableId != null" >
+        #{shareStocklableId,jdbcType=VARCHAR},
+      </if>
+      <if test="shareStartFund != null" >
+        #{shareStartFund,jdbcType=DOUBLE},
+      </if>
+      <if test="shareCurrentNum != null" >
+        #{shareCurrentNum,jdbcType=DOUBLE},
+      </if>
+      <if test="shareCurrentIncome != null" >
+        #{shareCurrentIncome,jdbcType=DOUBLE},
+      </if>
+      
+      <if test="shareStocklableName != null" >
+        #{shareStocklableName,jdbcType=VARCHAR},
+      </if>
+      '1'
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.Share" >
+    update tb_share
+    <set >
+      <if test="shareGroupId != null" >
+        share_group_id = #{shareGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="shareStocklableId != null" >
+        share_stocklable_id = #{shareStocklableId,jdbcType=VARCHAR},
+      </if>
+      <if test="shareStartFund != null" >
+        share_start_fund = #{shareStartFund,jdbcType=DOUBLE},
+      </if>
+      <if test="shareCurrentNum != null" >
+        share_current_num = #{shareCurrentNum,jdbcType=DOUBLE},
+      </if>
+      <if test="shareCurrentIncome != null" >
+        share_current_income = #{shareCurrentIncome,jdbcType=DOUBLE},
+      </if>
+      <if test="shareStocklableName != null" >
+        share_stocklable_name = #{shareStocklableName,jdbcType=VARCHAR},
+      </if>
+		<if test="shareStatus != null" >
+        share_status = #{shareStatus,jdbcType=VARCHAR},
+      </if>
+		      
+    </set>
+    where share_id = #{shareId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.Share" >
+    update tb_share
+    set share_group_id = #{shareGroupId,jdbcType=VARCHAR},
+      share_stocklable_id = #{shareStocklableId,jdbcType=VARCHAR},
+      share_start_fund = #{shareStartFund,jdbcType=DOUBLE},
+      share_current_num = #{shareCurrentNum,jdbcType=DOUBLE},
+      share_current_income = #{shareCurrentIncome,jdbcType=DOUBLE},
+      share_stocklable_name = #{shareStocklableName,jdbcType=VARCHAR},
+      share_status = #{shareStatus,jdbcType=VARCHAR}
+    where share_id = #{shareId,jdbcType=VARCHAR}
+  </update>
+</mapper>
