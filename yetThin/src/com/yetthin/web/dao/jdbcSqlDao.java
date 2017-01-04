@@ -5,8 +5,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.OptionalDouble;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import com.yetthin.web.commit.JdbcUtil;
 import com.yetthin.web.domain.BarDataOfDay;
@@ -153,7 +167,7 @@ public class jdbcSqlDao {
 		return cont;
 	}
 
-	public int insert(ProfitData r) {
+	public int insertProfitData(ProfitData r) {
 		String sql = "insert into tb_profitdata values ('" + r.getProfitdataId() + "','" + r.getProfitdataTime() + "','"
 				+ r.getProfitdataGroupId() + "','" + r.getProfitdataShareFundNum() + "'," + r.getProfitdataStock()
 				+ ")";
@@ -172,7 +186,117 @@ public class jdbcSqlDao {
 		}
 		return cont;
 	}
-
+	/**
+	 * 更新均线 
+	 * @return
+	 */
+	public int updateKMvalue(){
+		int count=0;
+		List<BarDataOfDay> barDataOfDays=selectNear60value();
+		/**
+		 * 分类 按股票代码  
+		 */
+		Map<String, List<BarDataOfDay>> barDataOfDayMapStockCode= 
+				barDataOfDays.stream().sorted(Comparator.comparing(BarDataOfDay::getDatetime).reversed())
+				.collect(Collectors.groupingBy(BarDataOfDay::getStockcode));
+		Set<String> set = barDataOfDayMapStockCode.keySet();
+		final List<BarDataOfDay> updateBardata=new ArrayList<>();
+		set.forEach(stockcode->{
+			List<BarDataOfDay> bardateTemp = barDataOfDayMapStockCode.get(stockcode);
+			if(bardateTemp.size()>0){
+			BarDataOfDay lastBarDataDay=bardateTemp.get(0);
+			bardateTemp.remove(0);
+			ToDoubleFunction<BarDataOfDay> fun =BarDataOfDay::getClose;
+			/**
+			 * 5 均线
+			 */
+			Double avgm5 = getMAvg(5, bardateTemp, fun);
+			Double avgm10 = getMAvg(10, bardateTemp, fun);
+			Double avgm20 = getMAvg(20, bardateTemp, fun);
+			Double avgm60 = getMAvg(60, bardateTemp, fun);
+			lastBarDataDay.setM5(avgm5);
+			lastBarDataDay.setM10(avgm10);
+			lastBarDataDay.setM20(avgm20);
+			lastBarDataDay.setM60(avgm60);
+			updateBardata.add(lastBarDataDay);
+			}
+		});
+		count = updateBardataOfDayMAvg(updateBardata);
+		return count; 
+	}
+	private int updateBardataOfDayMAvg(List<BarDataOfDay> barDataOfDays){
+		int count =0;
+		String sql ="update bardata set m5=?,m10=?,m20=?,m60=?";
+		PreparedStatement pre =null;
+		Connection conn =JdbcUtil.getconnection();
+		try {
+			pre=conn.prepareStatement(sql);
+			int cnt =0;
+			for (BarDataOfDay barDataOfDay : barDataOfDays) {
+				pre.setDouble(1,barDataOfDay.getM5());
+				pre.setDouble(2, barDataOfDay.getM10());
+				pre.setDouble(3, barDataOfDay.getM20());
+				pre.setDouble(4, barDataOfDay.getM60());
+				cnt++;
+				
+				pre.addBatch();
+				if(cnt%100==0){
+					pre.executeBatch();
+					pre.clearBatch();
+				}
+			}
+			count =cnt;
+			pre.executeBatch();
+			pre.clearBatch();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			count =0;
+		}finally{
+			JdbcUtil.close(conn, pre);
+		}
+		
+		return count;
+	}
+	private <T>Double getMAvg(int n, List<BarDataOfDay> days,ToDoubleFunction<BarDataOfDay> fun){
+		return days.stream().limit(n).mapToDouble(fun).average().orElse(0.0);
+		
+	}
+	/**
+	 * 获取 近60 条 日线数据 （未分类的）
+	 * @return
+	 */
+	private List<BarDataOfDay> selectNear60value(){
+		DateTimeFormatter formatter= DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate nowDate= LocalDate.now();
+		LocalDate oldDate= nowDate.plus(-15, ChronoUnit.WEEKS);
+		String nowDateStr= nowDate.format(formatter);
+		String oldDateStr= oldDate.format(formatter);
+		String sql ="select  dateTime, stockcode, close"
+				+ " from bardata where dateTime between '"+oldDateStr+"' and '"+nowDateStr+
+				"' order by dateTime desc";
+		Connection con = JdbcUtil.getconnection();
+		PreparedStatement pre= null;
+		List<BarDataOfDay> barDataOfDays=new LinkedList<>();
+		try {
+			pre=con.prepareStatement(sql);
+			ResultSet res = pre.executeQuery();
+			while(res.next()){
+				BarDataOfDay day =new BarDataOfDay();
+				day.setDatetime(res.getString("dateTime"));
+				day.setStockcode(res.getString("stockcode"));
+				day.setClose(res.getDouble("close"));
+				barDataOfDays.add(day);
+			}
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			JdbcUtil.close(con, pre);
+		}
+		return barDataOfDays;
+	}
 	public   int  insertBarDataOfDay(List<BarDataOfDay> days) {
 		String sql = "insert into bardata(dateTime, stockcode, height, low, open, close, stockname,volume) "
 				+ "values(?,?,?,?,?,?,?,?)";
@@ -289,5 +413,10 @@ public class jdbcSqlDao {
 			}
 		}
 		return List;
+	}
+
+	public void deleteTimeSame() {
+		// TODO Auto-generated method stub
+		
 	}
 }

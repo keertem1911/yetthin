@@ -22,7 +22,7 @@ public class BarDataOfDay {
     private Double m5;
     private Double m10;
     private Double m60;
-    private Double m120;
+    private Double m20;
 	private int passRate;
 	private int fundRate;
 	
@@ -42,7 +42,7 @@ public class BarDataOfDay {
 		this.m5 = 0.0;
 		this.m10 = 0.0;
 		this.m60 = 0.0;
-		this.m120 = 0.0;
+		this.m20 = 0.0;
 		this.passRate = 0;
 		this.fundRate = 0;
 	}
@@ -71,12 +71,13 @@ public class BarDataOfDay {
 		this.m60 = m60;
 	}
 
-	public Double getM120() {
-		return m120;
+	 
+	public Double getM20() {
+		return m20;
 	}
 
-	public void setM120(Double m120) {
-		this.m120 = m120;
+	public void setM20(Double m20) {
+		this.m20 = m20;
 	}
 
 	public String getVolume() {
@@ -171,9 +172,13 @@ public class BarDataOfDay {
 
 	@Override
 	public String toString() {
-		return "BarDataOfDay [datetime=" + datetime + ", stockcode=" + stockcode + ", m5=" + m5 + ", m10=" + m10
-				+ ", m60=" + m60 + ", m120=" + m120 + "]";
+		return "BarDataOfDay [id=" + id + ", datetime=" + datetime + ", stockcode=" + stockcode + ", height=" + height
+				+ ", low=" + low + ", open=" + open + ", close=" + close + ", stockname=" + stockname + ", volume="
+				+ volume + ", m5=" + m5 + ", m10=" + m10 + ", m60=" + m60 + ", m20=" + m20 + ", passRate=" + passRate
+				+ ", fundRate=" + fundRate + "]";
 	}
+
+ 
 
 	 
 }

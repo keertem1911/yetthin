@@ -24,4 +24,8 @@ public interface BarDataOfDayMapper {
 	List<BarDataOfDay> selectBarDataByStockCodes(List<String> symbols);
 	
 	List<BarDataOfDay> selectByDates(@Param("begin")String begin,@Param("end")String end);
+
+	List<String> selectLimitDay(int n);
+	
+	List<BarDataOfDay> selectBetweenDaY(Map<String, Object> map);
 }

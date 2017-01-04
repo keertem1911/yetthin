@@ -253,6 +253,7 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 		for(String key :keys){
 			map.put(key, jedis.get(key));
 		}
+		RedisUtil.RealseJedis_M(jedis);
 		return map;
 	}
 
@@ -317,7 +318,7 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 	// date.toString()+SPLIT_STR+open+SPLIT_STR+close+SPLIT_STR+height+SPLIT_STR+low);
 	// }
 	// } catch (ClassNotFoundException e) {
-	// // TODO Auto-generated catch block
+ 
 	// e.printStackTrace();
 	// } catch (SQLException e) {
 	// // TODO Auto-generated catch block
@@ -467,7 +468,7 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 		// boolean flag=pre.execute();
 		// }
 		// } catch (Exception e) {
-		// // TODO Auto-generated catch block
+	 
 		// e.printStackTrace();
 		// passed=false;
 		// }finally {
@@ -475,7 +476,7 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 		// try {
 		// connection.close();
 		// } catch (SQLException e) {
-		// // TODO Auto-generated catch block
+	 
 		// e.printStackTrace();
 		// passed=false;
 		// }
@@ -510,7 +511,14 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 		if(barDataOfDays.size()!=0){
 		jdbcSqlDao jdbcDao =new jdbcSqlDao();
 		 
+		/**
+		 * 更新日线
+		 */
 		jdbcDao.insertBarDataOfDay(barDataOfDays);
+		/**
+		 * 更新 日均线
+		 */
+		jdbcDao.updateKMvalue();
 		}
  
 	}
@@ -518,7 +526,11 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 	 * 保存 更新当前收益表
 	 */
 	public void updateProfitData() {
-		// TODO Auto-generated method stub
+		boolean sameBarData = checkbarDataSame();
+		/**
+		 * 和之前的数据库对比，防止在周内放假等因素 导致数据相同
+		 */
+		if(!sameBarData){
 		/**
 		 * 更新仓位表的 当前收益
 		 */
@@ -563,17 +575,44 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 					profitData.setProfitdataTime(LocalDate.now().toString()+" "+format_hhmm.format(new Date()));
 					profitData.setProfitdataGroupId(group.getGroupId());
 					profitData.setProfitdataShareFundNum(groupIncomeTotole);
-					jdbcdao.insert(profitData);
+					jdbcdao.insertProfitData(profitData);
 					jdbcdao.updateByPrimaryKey(group);
 				}
 		}
 		int  da=jdbcdao.deleteNumberZ();
-		System.out.println("deletye ");
+		
+		System.out.println("delete ");
 		InsertBarDataOfDay(stockList);
+		}
 		/**
 		 * 向 收益列表 插入 收益值
 		 */
 
+	}
+	/**
+	 * 检查是否存在相同的日线
+	 */
+	private boolean  checkbarDataSame() {
+		// TODO Auto-generated method stub
+		boolean same=false;
+		Jedis jedis = jedispool.getResource();
+		jedis.auth(auth);
+		jedis.select(0);
+		String SH000001= jedis.get("000001.SH");
+		String SZ000001= jedis.get("000001.SZ");
+		/**
+		 * 选择备份数据库对比数据
+		 */
+		jedis.select(3);
+		String SH000001BAK= jedis.get("000001.SH");
+		String SZ000001BAK= jedis.get("000001.SZ");
+		if(SH000001BAK!=null&&SZ000001BAK!=null&&SH000001.trim().equals(SH000001BAK.trim())&&SZ000001.trim().equals(SZ000001BAK.trim())){
+			same=true;
+		}else{
+		bankupBardata();
+		}
+		RedisUtil.RealseJedis_M(jedis);
+		return same;
 	}
 
 	/**
@@ -659,6 +698,26 @@ public class JtdoaAPIDao extends BaseService implements QQMarketLevelUtilByMaste
 	//
 	//
 	// RedisUtil.RealseJedis_M(jedis);
+	/**
+	 * 备份 日线数据
+	 */
+	private void bankupBardata() {
+		// TODO Auto-generated method stub
+		Jedis jedis = jedispool.getResource();
+		jedis.auth(auth);
+		jedis.select(0);
+		Set<String> keys = jedis.keys("*");
+		final Map<String, String> mapValue= new HashMap<>();
+		keys.forEach(key->{
+			mapValue.put(key, jedis.get(key));
+		});
+		jedis.select(3);
+		keys.forEach(key->{
+			jedis.set(key, mapValue.get(key));
+		});
+		
+		RedisUtil.RealseJedis_M(jedis);
+	}
 
 	// }
 	/**

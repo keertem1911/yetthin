@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yetthin.web.commit.ValueFormatUtil;
+import com.yetthin.web.commit.strategyFuntion;
 import com.yetthin.web.dao.JtdoaAPIDao;
 import com.yetthin.web.domain.BarDataOfDay;
 import com.yetthin.web.domain.Concept;
@@ -611,6 +612,17 @@ public class GroupServiceImp extends BaseService implements GroupService, ValueF
 					.sorted(Comparator.comparing(StockLable::getStocklableCode)).collect(toList());
 //			List<BarDataOfDay> listAvg = barDataOfDayMapper.selectByDates("2016-12-01","2016-12-10");
 		}
+		List<String> dates=  barDataOfDayMapper.selectLimitDay(5);
+		LocalDate localDate=LocalDate.now();
+		String dateStr= localDate.format(format_yyyy_MM_dd);
+		String beginDate= dates.get(dates.size()-1);
+		Map<String, Object> maps =new HashMap<>();
+		maps.put("begin", beginDate);
+		maps.put("end", dateStr);
+		List<String> stockcode= lists.parallelStream().map(StockLable::getStocklableCode).collect(toList());
+		maps.put("list",	stockcode);
+		List<BarDataOfDay> barDataOfDays=barDataOfDayMapper.selectBetweenDaY(maps);
+		strategyFuntion.strategy(barDataOfDays, type, limit);
 		return lists;
 	}
 

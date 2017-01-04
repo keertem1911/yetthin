@@ -14,11 +14,11 @@
     <result column="m5" property="m5" jdbcType="DOUBLE" />
     <result column="m10" property="m10" jdbcType="DOUBLE" />
     <result column="m60" property="m60" jdbcType="DOUBLE" />
-    <result column="m120" property="m120" jdbcType="DOUBLE" />
+    <result column="m20" property="m20" jdbcType="DOUBLE" />
   </resultMap>
   <sql id="Base_Column_List" >
     id, dateTime, stockcode, height, low, open, close, stockname, volume, m5, m10, m60, 
-    m120
+    m20
   </sql>
   <select id="selectByDates" resultMap="BaseResultMaps">
   	select 
@@ -26,14 +26,6 @@
   	from bardata
   	 where DATE(dateTime) between DATE(#{begin,jdbcType=VARCHAR}) AND  DATE(#{end,jdbcType=VARCHAR})
   </select>
-  
-  
-  
-  
-  
-  
-  
-  
   
   <select id="selectBarDataByStockCodes" parameterType="java.util.List" resultMap="BaseResultMaps">
   	select 
@@ -43,7 +35,22 @@
   	<foreach collection="list" item="item" open="(" close=")" separator="," >
   		#{item,jdbcType=VARCHAR}
   	</foreach>
-  
+  </select>
+  <select id="selectBetweenDaY" parameterType="java.util.Map" resultMap="BaseResultMaps">
+  	select 
+  		<include refid="Base_Column_List"></include>
+  		from bardata
+  	where stockcode in
+  	<foreach collection="list" item="item" open="(" close=")" separator="," >
+  		#{item,jdbcType=VARCHAR}
+  	</foreach>
+  	and datetime between #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR}
+  </select>
+  <select id="selectLimitDay" parameterType="int" resultType="string">
+  		select 
+  		 datetime
+  		from bardata where stockcode='000001.SZ' 
+  		order by datetime desc limit #{n,jdbcType=INTEGER} 
   </select>
   
   <select id="selectByPrimaryKey" resultMap="BaseResultMaps" parameterType="java.lang.String" >

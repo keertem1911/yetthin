@@ -45,7 +45,7 @@ SinaMarketIndex,JtdoaValueMarket{
 	private Executor executor = Executors.newFixedThreadPool(200);
 	private static final String [] TIME1 ={"09:20:00","11:10:00"};
 	private static final String [] TIME2={"13:05:00","15:10:00"};  
-	private static final String [] SAVE_DAY_K={"19:00:00","20:55:00"};
+	private static final String [] SAVE_DAY_K={"19:40:00","20:55:00"};
 	
 	@Override
 	public void contextDestroyed(ServletContextEvent arg0) {

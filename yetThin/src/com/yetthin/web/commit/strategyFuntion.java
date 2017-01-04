@@ -3,14 +3,32 @@ package com.yetthin.web.commit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils.Collections;
 import com.yetthin.web.domain.BarDataOfDay;
+import com.yetthin.web.domain.StockLable;
 import com.yetthin.web.domain.stockKempty;
 
 public class strategyFuntion {
+	/**
+	 * 根据选择的 策略 进行股票的筛选
+	 * @param list
+	 * @param type
+	 * @param limit
+	 * @return
+	 */
 	public  static  List<BarDataOfDay> strategy(List<BarDataOfDay> list,int type,int limit){
+		/**
+		 * 按照 股票代码进行分类 并且按照 时间晚早 排序
+		 */
+		Map<String, List<BarDataOfDay>> mapByStockCode= 
+				list.parallelStream().sorted(Comparator.comparing(BarDataOfDay::getDatetime).reversed()).
+				collect(Collectors.groupingBy(BarDataOfDay::getStockcode));
+		
 		List<BarDataOfDay> filter =new ArrayList<>();
 		for(BarDataOfDay bar :list){
 			double open =bar.getOpen();
@@ -24,7 +42,7 @@ public class strategyFuntion {
 			int  fundRate =(int) (100*(close-open)/(open));
 			bar.setPassRate(passRate);
 			bar.setFundRate(fundRate);
-			System.out.println(passRate+" "+fundRate);
+			 
 		}	 
 			
 		Predicate<BarDataOfDay> pre =null;

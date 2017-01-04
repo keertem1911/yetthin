@@ -73,7 +73,7 @@ public class AvgDao {
 				+ "set m5 = ? , "
 				+ " m10 = ? , "
 				+ " m60 = ? , "
-				+ " m120 = ? where id = ? ";
+				+ " m20 = ? where id = ? ";
 		Connection connection = JdbcUtil.getconnection();
 		PreparedStatement prepareStatement =null;
 		try {
@@ -84,7 +84,7 @@ public class AvgDao {
 				prepareStatement.setDouble(1, bar.getM5());
 				prepareStatement.setDouble(2, bar.getM10());
 				prepareStatement.setDouble(3, bar.getM60());
-				prepareStatement.setDouble(4, bar.getM120());
+				prepareStatement.setDouble(4, bar.getM20());
 				prepareStatement.setInt(5,Integer.parseInt(bar.getId()));
 				
 				prepareStatement.addBatch();
