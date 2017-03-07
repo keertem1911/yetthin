@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
+
+	<context:annotation-config></context:annotation-config>
+	<context:component-scan base-package="com.yetthin.web.*,util"></context:component-scan>
+ 	
+ 	<context:property-placeholder location="classpath:db.properties"/>
+ 	 
+ 	<!-- 
+	c3p0 数据源
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${jdbc.connect.driver}"></property>
+		<property name="jdbcUrl" value="${jdbc.connect.url}"></property>
+		<property name="user" value="${jdbc.connect.username}"></property>
+		<property name="password" value="${jdbc.connect.passwd}"></property>
+		<property name="initialPoolSize" value="${pool.initSize}"></property>
+		<property name="maxPoolSize" value="${pool.maxSize}"></property>
+		<property name="idleConnectionTestPeriod" value="18000"></property>
+		<property name="testConnectionOnCheckin" value="true"></property>
+		连接的最大空闲时间，如果超过这个时间，某个数据库连接还没有被使用，则会断开掉这个连接。
+		如果为0，则永远不会断开连接,即回收此连接。default : 0 单位 s（建议使用）
+		<property name="maxIdleTime" value="3600"></property>
+		连接池在无空闲连接可用时一次性创建的新数据库连接数,default : 3
+		<property name="acquireIncrement" value="3"></property>
+		<property name="maxIdleTime"><value>1800</value></property> 
+
+		<property name="testConnectionOnCheckout" value="true"></property>
+		每900秒检查所有连接池中的空闲连接
+		<property name="idleConnectionTestPeriod" value="900"></property>
+		连接池为数据源缓存的PreparedStatement的总数。
+		<property name="maxStatementsPerConnection" value="100"></property>
+	</bean> -->
+	<!--  数据库 sessionFactory -->
+			<bean name="dataSource"  class="com.mchange.v2.c3p0.ComboPooledDataSource">
+				<!-- 数据连接信息 -->
+				<property name="jdbcUrl" value="${jdbc.url}"></property>
+				<property name="driverClass" value="${jdbc.classDriver}"></property>
+				<property name="user" value="${jdbc.username}"></property>
+				<property name="password" value="${jdbc.password}"></property>
+				<!-- 其他配置 -->
+				<!--初始化时获取三个连接，取值应在minPoolSize与maxPoolSize之间。Default: 3 -->
+				<property name="initialPoolSize" value="${jdbc.initPool}"></property>
+				<!--连接池中保留的最小连接数。Default: 3 -->
+				<property name="minPoolSize" value="3"></property>
+			 	<!--当连接池中的连接耗尽的时候c3p0一次同时获取的连接数。Default: 3 -->
+				<property name="acquireIncrement" value="10"></property>
+				 </bean>
+	 
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="typeAliasesPackage" value="com.yetthin.web.domain"></property>
+	</bean>
+	 
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" lazy-init="true">
+		<property name="basePackage" value="com.yetthin.web.persistence*"></property>
+	</bean>
+	<!-- sqlTemplate 模板 -->
+	<bean id="sqlSessionTemplate"  class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sessionFactory"></constructor-arg>
+	</bean>
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	 	<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	 
+	
+	  <tx:annotation-driven proxy-target-class="false" transaction-manager="transactionManager"/>
+  <!-- 配置 MultipartResolver -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<property name="maxUploadSize" value="1024000000"></property>	
+	</bean>	
+	 
+</beans>

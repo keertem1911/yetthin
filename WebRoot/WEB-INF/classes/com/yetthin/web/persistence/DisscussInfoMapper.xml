@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.DisscussInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.DisscussInfo" >
+    <id column="discussinfo_id" property="discussinfoId" jdbcType="VARCHAR" />
+    <result column="discussinfo_sendperson_id" property="discussinfoSendpersonId" jdbcType="VARCHAR" />
+    <result column="discussinfo_create_time" property="discussinfoCreateTime" jdbcType="VARCHAR" />
+    <result column="discussinfo_higher_id" property="discussinfoHigherId" jdbcType="VARCHAR" />
+    <result column="discussinfo_group_id" property="discussinfoGroupId" jdbcType="VARCHAR" />
+   
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.yetthin.web.domain.DisscussInfo" extends="BaseResultMap" >
+    <result column="discussinfo_content" property="discussinfoContent" jdbcType="LONGVARCHAR" />
+  </resultMap>
+   <resultMap id="BaseResultMapByGroupRecommend" type="com.yetthin.web.domain.GroupRecommend" extends="ResultMapWithBLOBs" >
+  		 <result column="higher_name" property="higherName" jdbcType="VARCHAR"/>
+  		  <result column="sendperson_name" property="discussinfoSendpersonName" jdbcType="VARCHAR"/>
+    <result column="sendperson_img" property="discussinfoSendpersonImg" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <sql id="Base_Column_List" >
+    discussinfo_id, discussinfo_sendperson_id, discussinfo_create_time, discussinfo_higher_id, 
+    discussinfo_group_id
+  </sql>
+  <sql id="Blob_Column_List" >
+    discussinfo_content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+   
+    from tb_disscussinfo,tb_user
+    where discussinfo_group_id = #{discussinfoId,jdbcType=VARCHAR}  
+  </select>
+  <select id="selectByGroupId" resultMap="BaseResultMapByGroupRecommend" parameterType="java.lang.String" >
+ 	  select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    ,u1.user_name as  higher_name,u1.user_name as sendperson_name, u1.user_head_pic as sendperson_img
+    from tb_disscussinfo,tb_user u1 
+    where discussinfo_group_id = #{groupId,jdbcType=VARCHAR} and  discussinfo_sendperson_id=u1.user_id 
+    and discussinfo_higher_id='0' order by discussinfo_create_time asc
+  </select>
+  <select id="selectByGroupIdFromList" parameterType="java.util.List"
+  resultMap="ResultMapWithBLOBs">
+				  select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from tb_disscussinfo
+    where 
+    <if test="list.size()>0">
+    discussinfo_group_id in
+    <foreach collection="list" item="item"
+    open="(" close=")" separator="," >
+    	#{item,jdbcType=VARCHAR}
+    </foreach>   
+    and </if>
+    discussinfo_higher_id='0' order by discussinfo_create_time asc  
+  
+  </select> 
+  <select id="selectByDisscussionFromDisscuss" parameterType="java.util.List" resultMap="BaseResultMapByGroupRecommend">
+	select    
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    ,u.user_name as higher_name,u1.user_head_pic as sendperson_img, u1.user_name as sendperson_name
+     from tb_disscussinfo d,tb_user u,tb_user u1
+    where
+    <if test="list !=null">
+     discussinfo_group_id 
+    in 
+    <foreach collection="list" item="item" index="index" 
+    open="(" close=")" separator="," >
+    #{item,jdbcType=VARCHAR}
+    </foreach>
+    and 
+    </if>
+      <if test="list ==null">
+      discussinfo_group_id  in('0000') 
+    
+    and 
+    </if>
+     d.discussinfo_higher_id = u.user_id and d.discussinfo_sendperson_id =u1.user_id
+   		order by discussinfo_create_time asc
+  
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_disscussinfo
+    where discussinfo_id = #{discussinfoId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByGroupId" parameterType="java.lang.String" >
+    delete from tb_disscussinfo  
+    where tb_disscussinfo.discussinfo_higher_id =#{groupId,jdbcType=VARCHAR}
+   
+  </delete>  
+  <select id="selectByGroupIdFindDissinfo" parameterType="java.lang.String" resultType="java.lang.String">
+     select discussinfo_id  
+    from tb_disscussinfo d 
+    where d.discussinfo_higher_id='0' and d.discussinfo_group_id= #{groupId,jdbcType=VARCHAR}
+    limit 1  
+   
+  </select>  
+ <insert id="insert" parameterType="com.yetthin.web.domain.DisscussInfo" >
+    insert into tb_disscussinfo (discussinfo_id, discussinfo_sendperson_id, 
+      discussinfo_create_time, 
+      discussinfo_higher_id, 
+      discussinfo_group_id, 
+      discussinfo_content 
+      )
+    values (#{discussinfoId,jdbcType=VARCHAR}, #{discussinfoSendpersonId,jdbcType=VARCHAR}, 
+      #{discussinfoCreateTime,jdbcType=VARCHAR},
+       #{discussinfoHigherId,jdbcType=VARCHAR}, 
+      #{discussinfoGroupId,jdbcType=VARCHAR},
+       #{discussinfoContent,jdbcType=LONGVARCHAR} 
+      )
+  </insert>  
+    <insert id="insertSelective" parameterType="com.yetthin.web.domain.DisscussInfo" >
+    insert into tb_disscussinfo
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="discussinfoId != null" >
+        discussinfo_id,
+      </if>
+      <if test="discussinfoSendpersonId != null" >
+        discussinfo_sendperson_id,
+      </if>
+      <if test="discussinfoCreateTime != null" >
+        discussinfo_create_time,
+      </if>
+      <if test="discussinfoHigherId != null" >
+        discussinfo_higher_id,
+      </if>
+      <if test="discussinfoGroupId != null" >
+        discussinfo_group_id,
+      </if>
+      <if test="discussinfoContent != null" >
+        discussinfo_content 
+      </if>
+       
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="discussinfoId != null" >
+        #{discussinfoId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoSendpersonId != null" >
+        #{discussinfoSendpersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoCreateTime != null" >
+        #{discussinfoCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoHigherId != null" >
+        #{discussinfoHigherId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoGroupId != null" >
+        #{discussinfoGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoContent != null" >
+        #{discussinfoContent,jdbcType=LONGVARCHAR} 
+      </if>
+      
+    </trim>
+  </insert> 
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.DisscussInfo" >
+    update tb_disscussinfo
+    <set >
+      <if test="discussinfoSendpersonId != null" >
+        discussinfo_sendperson_id = #{discussinfoSendpersonId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoCreateTime != null" >
+        discussinfo_create_time = #{discussinfoCreateTime,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoHigherId != null" >
+        discussinfo_higher_id = #{discussinfoHigherId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoGroupId != null" >
+        discussinfo_group_id = #{discussinfoGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="discussinfoContent != null" >
+        discussinfo_content = #{discussinfoContent,jdbcType=LONGVARCHAR} 
+      </if>
+      
+    </set>
+    where discussinfo_id = #{discussinfoId,jdbcType=VARCHAR}
+  </update> 
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.yetthin.web.domain.DisscussInfo" >
+    update tb_disscussinfo
+    set discussinfo_sendperson_id = #{discussinfoSendpersonId,jdbcType=VARCHAR},
+      discussinfo_create_time = #{discussinfoCreateTime,jdbcType=VARCHAR},
+      discussinfo_higher_id = #{discussinfoHigherId,jdbcType=VARCHAR},
+      discussinfo_group_id = #{discussinfoGroupId,jdbcType=VARCHAR},
+      discussinfo_content = #{discussinfoContent,jdbcType=LONGVARCHAR} 
+    
+    where discussinfo_id = #{discussinfoId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.DisscussInfo" >
+    update tb_disscussinfo
+    set discussinfo_sendperson_id = #{discussinfoSendpersonId,jdbcType=VARCHAR},
+      discussinfo_create_time = #{discussinfoCreateTime,jdbcType=VARCHAR},
+      discussinfo_higher_id = #{discussinfoHigherId,jdbcType=VARCHAR},
+      discussinfo_group_id = #{discussinfoGroupId,jdbcType=VARCHAR}
+     
+    where discussinfo_id = #{discussinfoId,jdbcType=VARCHAR}
+  </update> 
+</mapper>

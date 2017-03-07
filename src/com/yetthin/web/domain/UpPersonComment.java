@@ -1,0 +1,49 @@
+package com.yetthin.web.domain;
+
+public class UpPersonComment {
+		private String name;
+		private String repateContext;
+		private String userid;
+		private String repeateId;
+		private String commentId;
+		private String fromName;
+		
+		 
+		public String getCommentId() {
+			return commentId;
+		}
+		public void setCommentId(String commentId) {
+			this.commentId = commentId;
+		}
+		public String getName() {
+			return name;
+		}
+		public String getRepeateId() {
+			return repeateId;
+		}
+		public void setRepeateId(String repeateId) {
+			this.repeateId = repeateId;
+		}
+		public void setName(String name) {
+			this.name = name;
+		}
+		public String getRepateContext() {
+			return repateContext;
+		}
+		public void setRepateContext(String repateContext) {
+			this.repateContext = repateContext;
+		}
+		public String getUserid() {
+			return userid;
+		}
+		public void setUserid(String userid) {
+			this.userid = userid;
+		}
+		public String getFromName() {
+			return fromName;
+		}
+		public void setFromName(String fromName) {
+			this.fromName = fromName;
+		}
+		
+}

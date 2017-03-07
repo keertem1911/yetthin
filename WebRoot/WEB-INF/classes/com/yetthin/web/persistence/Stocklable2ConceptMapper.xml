@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.Stocklable2ConceptMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.Stocklable2Concept" >
+    <id column="stocklable2concept_id" property="stocklable2conceptId" jdbcType="VARCHAR" />
+    <result column="stocklable2concept_sl_id" property="stocklable2conceptSlId" jdbcType="VARCHAR" />
+    <result column="stocklable2concept_cc_id" property="stocklable2conceptCcId" jdbcType="VARCHAR" />
+  </resultMap>
+   <resultMap id="stockLable" type="com.yetthin.web.domain.StockLable" >
+    <id column="stocklable_id" property="stocklableId" jdbcType="VARCHAR" />
+    <result column="stocklable_code" property="stocklableCode" jdbcType="VARCHAR" />
+    <result column="stocklable_name" property="stocklableName" jdbcType="VARCHAR" />
+    <result column="stocklable_type" property="stocklableType" jdbcType="VARCHAR" />
+    <result column="stocklable_market" property="stocklableMarket" jdbcType="VARCHAR" />
+    <result column="stocklable_trade" property="stocklableTrade" jdbcType="VARCHAR" />
+    <result column="stocklable_status" property="stocklableStatus" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    stocklable2concept_id, stocklable2concept_sl_id, stocklable2concept_cc_id
+  </sql>
+   <sql id="stock_sql" >stocklable_code,stocklable_name,stocklable_type,stocklable_market
+  ,stocklable_trade,stocklable_status,stocklable_id</sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_stocklable2concept
+    where stocklable2concept_id = #{stocklable2conceptId,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectStockByConceptId" parameterType="java.util.List" resultMap="stockLable">
+  	select <include refid="Base_Column_List" />,
+  	<include refid="stock_sql"></include>
+  	 from tb_stocklable2concept,tb_stocklable
+  	 <where>
+  	 	stocklable2concept_sl_id=stocklable_code 
+  	 	and stocklable2concept_cc_id in 
+  	 	<foreach collection="list" open="(" close=")" separator="," item="item">
+  	 		#{item,jdbcType=VARCHAR}
+  	 	</foreach>
+  	 </where>
+  	 order by stocklable_code asc
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_stocklable2concept
+    where stocklable2concept_id = #{stocklable2conceptId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.Stocklable2Concept" >
+    <selectKey resultType="java.lang.String" keyProperty="stocklable2conceptId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_stocklable2concept (stocklable2concept_id, stocklable2concept_sl_id, 
+      stocklable2concept_cc_id)
+    values (#{stocklable2conceptId,jdbcType=VARCHAR}, #{stocklable2conceptSlId,jdbcType=VARCHAR}, 
+      #{stocklable2conceptCcId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.Stocklable2Concept" >
+    <selectKey resultType="java.lang.String" keyProperty="stocklable2conceptId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_stocklable2concept
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      stocklable2concept_id,
+      <if test="stocklable2conceptSlId != null" >
+        stocklable2concept_sl_id,
+      </if>
+      <if test="stocklable2conceptCcId != null" >
+        stocklable2concept_cc_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{stocklable2conceptId,jdbcType=VARCHAR},
+      <if test="stocklable2conceptSlId != null" >
+        #{stocklable2conceptSlId,jdbcType=VARCHAR},
+      </if>
+      <if test="stocklable2conceptCcId != null" >
+        #{stocklable2conceptCcId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.Stocklable2Concept" >
+    update tb_stocklable2concept
+    <set >
+      <if test="stocklable2conceptSlId != null" >
+        stocklable2concept_sl_id = #{stocklable2conceptSlId,jdbcType=VARCHAR},
+      </if>
+      <if test="stocklable2conceptCcId != null" >
+        stocklable2concept_cc_id = #{stocklable2conceptCcId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where stocklable2concept_id = #{stocklable2conceptId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.Stocklable2Concept" >
+    update tb_stocklable2concept
+    set stocklable2concept_sl_id = #{stocklable2conceptSlId,jdbcType=VARCHAR},
+      stocklable2concept_cc_id = #{stocklable2conceptCcId,jdbcType=VARCHAR}
+    where stocklable2concept_id = #{stocklable2conceptId,jdbcType=VARCHAR}
+  </update>
+</mapper>

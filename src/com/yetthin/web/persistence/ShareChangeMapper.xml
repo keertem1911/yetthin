@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.ShareChangeMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.ShareChange" >
+    <id column="sharechange_id" property="sharechangeId" jdbcType="VARCHAR" />
+    <result column="sharechange_stocklable_id" property="sharechangeStocklableId" jdbcType="VARCHAR" />
+    <result column="sharechange_time" property="sharechangeTime" jdbcType="VARCHAR" />
+    <result column="sharechange_price" property="sharechangePrice" jdbcType="DOUBLE" />
+    <result column="sharechange_dir" property="sharechangeDir" jdbcType="VARCHAR" />
+    <result column="sharechange_num" property="sharechangeNum" jdbcType="DOUBLE" />
+    <result column="sharechange_group_id" property="sharechangeGroupId" jdbcType="VARCHAR" />
+  	
+  </resultMap>
+  <sql id="Base_Column_List" >
+    sharechange_id, sharechange_stocklable_id, sharechange_time, sharechange_price, sharechange_dir, 
+    sharechange_num,sharechange_group_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_sharechange
+    where sharechange_id = #{sharechangeId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectLastChangeTime" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_sharechange
+  	 order by sharechange_time desc limit 1
+  </select>
+  <select id="getLastShareChangeByGroupId" parameterType="java.lang.String" resultType="java.lang.String">
+  		select sharechange_time from tb_sharechange where sharechange_group_id= #{groupId,jdbcType=VARCHAR}
+  		order by sharechange_time limit 1
+  </select>
+  <select id="selectByGroupId" parameterType="java.lang.String" resultMap="BaseResultMap">
+  	select <include refid="Base_Column_List"></include>
+  	from tb_sharechange where sharechange_group_id=#{groupId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_sharechange
+    where sharechange_id = #{sharechangeId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.ShareChange" >
+    
+    insert into tb_sharechange (sharechange_id, sharechange_stocklable_id, 
+      sharechange_time, sharechange_price, sharechange_dir, 
+      sharechange_num,sharechange_group_id)
+    values 
+    <foreach collection="list" open="(" close=")" separator="),(" item="item" > 
+    #{item.sharechangeId,jdbcType=VARCHAR},
+     #{item.sharechangeStocklableId,jdbcType=VARCHAR}, 
+      #{item.sharechangeTime,jdbcType=VARCHAR},
+      #{item.sharechangePrice,jdbcType=DOUBLE}, 
+      #{item.sharechangeDir,jdbcType=VARCHAR}, 
+      #{item.sharechangeNum,jdbcType=DOUBLE},
+      #{item.sharechangeGroupId,jdbcType=VARCHAR}
+      </foreach>
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.ShareChange" >
+    
+    insert into tb_sharechange
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      sharechange_id,
+      <if test="sharechangeStocklableId != null" >
+        sharechange_stocklable_id,
+      </if>
+      <if test="sharechangeTime != null" >
+        sharechange_time,
+      </if>
+      <if test="sharechangePrice != null" >
+        sharechange_price,
+      </if>
+      <if test="sharechangeDir != null" >
+        sharechange_dir,
+      </if>
+      <if test="sharechangeNum != null" >
+        sharechange_num,
+      </if>
+      <if test="sharechangeGroupId != null" >
+        sharechange_group_id 
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{sharechangeId,jdbcType=VARCHAR},
+      <if test="sharechangeStocklableId != null" >
+        #{sharechangeStocklableId,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangeTime != null" >
+        #{sharechangeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangePrice != null" >
+        #{sharechangePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="sharechangeDir != null" >
+        #{sharechangeDir,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangeNum != null" >
+        #{sharechangeNum,jdbcType=DOUBLE},
+      </if>
+      <if test="sharechangeGroupId != null" >
+        #{sharechangeGroupId,jdbcType=VARCHAR} 
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.ShareChange" >
+    update tb_sharechange
+    <set >
+      <if test="sharechangeStocklableId != null" >
+        sharechange_stocklable_id = #{sharechangeStocklableId,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangeTime != null" >
+        sharechange_time = #{sharechangeTime,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangePrice != null" >
+        sharechange_price = #{sharechangePrice,jdbcType=DOUBLE},
+      </if>
+      <if test="sharechangeDir != null" >
+        sharechange_dir = #{sharechangeDir,jdbcType=VARCHAR},
+      </if>
+      <if test="sharechangeNum != null" >
+        sharechange_num = #{sharechangeNum,jdbcType=DOUBLE},
+      </if>
+      <if test="sharechangeGroupId != null" >
+        sharechange_group_id = #{sharechangeGroupId,jdbcType=VARCHAR} 
+      </if>
+    </set>
+    where sharechange_id = #{sharechangeId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.ShareChange" >
+    update tb_sharechange
+    set sharechange_stocklable_id = #{sharechangeStocklableId,jdbcType=VARCHAR},
+      sharechange_time = #{sharechangeTime,jdbcType=VARCHAR},
+      sharechange_price = #{sharechangePrice,jdbcType=DOUBLE},
+      sharechange_dir = #{sharechangeDir,jdbcType=VARCHAR},
+      sharechange_num = #{sharechangeNum,jdbcType=DOUBLE}
+     sharechange_group_id = #{sharechangeGroupId,jdbcType=VARCHAR} 
+    where sharechange_id = #{sharechangeId,jdbcType=VARCHAR}
+  </update>
+</mapper>

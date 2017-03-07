@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.BarDataOfDayMapper" >
+  <resultMap id="BaseResultMaps" type="com.yetthin.web.domain.BarDataOfDay" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="dateTime" property="datetime" jdbcType="VARCHAR" />
+    <result column="stockcode" property="stockcode" jdbcType="VARCHAR" />
+    <result column="height" property="height" jdbcType="DOUBLE" />
+    <result column="low" property="low" jdbcType="DOUBLE" />
+    <result column="open" property="open" jdbcType="DOUBLE" />
+    <result column="close" property="close" jdbcType="DOUBLE" />
+    <result column="stockname" property="stockname" jdbcType="VARCHAR" />
+    <result column="volume" property="volume" jdbcType="VARCHAR" />
+    <result column="m5" property="m5" jdbcType="DOUBLE" />
+    <result column="m10" property="m10" jdbcType="DOUBLE" />
+    <result column="m60" property="m60" jdbcType="DOUBLE" />
+    <result column="m20" property="m20" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, dateTime, stockcode, height, low, open, close, stockname, volume, m5, m10, m60, 
+    m20
+  </sql>
+  <select id="selectByDates" resultMap="BaseResultMaps">
+  	select 
+  	<include refid="Base_Column_List"></include>
+  	from bardata
+  	 where DATE(dateTime) between DATE(#{begin,jdbcType=VARCHAR}) AND  DATE(#{end,jdbcType=VARCHAR})
+  </select>
+  
+  <select id="selectBarDataByStockCodes" parameterType="java.util.List" resultMap="BaseResultMaps">
+  	select 
+  		<include refid="Base_Column_List"></include>
+  		from bardata
+  	where stockcode in
+  	<foreach collection="list" item="item" open="(" close=")" separator="," >
+  		#{item,jdbcType=VARCHAR}
+  	</foreach>
+  </select>
+  <select id="selectBetweenDaY" parameterType="java.util.Map" resultMap="BaseResultMaps">
+  	select 
+  		<include refid="Base_Column_List"></include>
+  		from bardata
+  	where stockcode in
+  	<foreach collection="list" item="item" open="(" close=")" separator="," >
+  		#{item,jdbcType=VARCHAR}
+  	</foreach>
+  	and datetime between #{begin,jdbcType=VARCHAR} and #{end,jdbcType=VARCHAR}
+  </select>
+  <select id="selectLimitDay" parameterType="int" resultType="string">
+  		select 
+  		 datetime
+  		from bardata where stockcode='000001.SZ' 
+  		order by datetime desc limit #{n,jdbcType=INTEGER} 
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMaps" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from bardata
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from bardata
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.BarDataOfDay" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bardata (id, dateTime, stockcode, 
+      height, low, open, close, 
+      stockname)
+    values (#{id,jdbcType=BIGINT}, #{datetime,jdbcType=VARCHAR}, #{stockcode,jdbcType=VARCHAR}, 
+      #{height,jdbcType=DOUBLE}, #{low,jdbcType=DOUBLE}, #{open,jdbcType=DOUBLE}, #{close,jdbcType=DOUBLE}, 
+      #{stockname,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.BarDataOfDay" >
+    <selectKey resultType="java.lang.Integer" keyProperty="id" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into bardata
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      id,
+      <if test="datetime != null" >
+        dateTime,
+      </if>
+      <if test="stockcode != null" >
+        stockcode,
+      </if>
+      <if test="height != null" >
+        height,
+      </if>
+      <if test="low != null" >
+        low,
+      </if>
+      <if test="open != null" >
+        open,
+      </if>
+      <if test="close != null" >
+        close,
+      </if>
+      <if test="stockname != null" >
+        stockname,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{id,jdbcType=BIGINT},
+      <if test="datetime != null" >
+        #{datetime,jdbcType=VARCHAR},
+      </if>
+      <if test="stockcode != null" >
+        #{stockcode,jdbcType=VARCHAR},
+      </if>
+      <if test="height != null" >
+        #{height,jdbcType=DOUBLE},
+      </if>
+      <if test="low != null" >
+        #{low,jdbcType=DOUBLE},
+      </if>
+      <if test="open != null" >
+        #{open,jdbcType=DOUBLE},
+      </if>
+      <if test="close != null" >
+        #{close,jdbcType=DOUBLE},
+      </if>
+      <if test="stockname != null" >
+        #{stockname,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.BarDataOfDay" >
+    update bardata
+    <set >
+      <if test="datetime != null" >
+        dateTime = #{datetime,jdbcType=VARCHAR},
+      </if>
+      <if test="stockcode != null" >
+        stockcode = #{stockcode,jdbcType=VARCHAR},
+      </if>
+      <if test="height != null" >
+        height = #{height,jdbcType=DOUBLE},
+      </if>
+      <if test="low != null" >
+        low = #{low,jdbcType=DOUBLE},
+      </if>
+      <if test="open != null" >
+        open = #{open,jdbcType=DOUBLE},
+      </if>
+      <if test="close != null" >
+        close = #{close,jdbcType=DOUBLE},
+      </if>
+      <if test="stockname != null" >
+        stockname = #{stockname,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.BarDataOfDay" >
+    update bardata
+    set dateTime = #{datetime,jdbcType=VARCHAR},
+      stockcode = #{stockcode,jdbcType=VARCHAR},
+      height = #{height,jdbcType=DOUBLE},
+      low = #{low,jdbcType=DOUBLE},
+      open = #{open,jdbcType=DOUBLE},
+      close = #{close,jdbcType=DOUBLE},
+      stockname = #{stockname,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

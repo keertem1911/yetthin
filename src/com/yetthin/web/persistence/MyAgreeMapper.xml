@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.MyAgreeMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.MyAgree" >
+    <id column="agree_id" property="agreeId" jdbcType="INTEGER" />
+    <result column="agree_group_id" property="agreeGroupId" jdbcType="VARCHAR" />
+    <result column="agree_user_id" property="agreeUserId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    agree_id, agree_group_id, agree_user_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_agree
+    where agree_id = #{agreeId,jdbcType=INTEGER}
+  </select>
+  <select id="selectByGroupId" parameterType="string" resultMap="BaseResultMap">
+  select 
+  <include refid="Base_Column_List" />
+    from tb_agree
+    where agree_group_id =#{groupId,jdbcType=VARCHAR}
+  </select>
+   <select id="selectByUserId" parameterType="string" resultMap="BaseResultMap">
+  select 
+  <include refid="Base_Column_List" />
+    from tb_agree
+    where agree_user_id =#{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByGroupIdAndUserId" parameterType="java.util.Map" resultMap="BaseResultMap">
+  select 
+   <include refid="Base_Column_List" />
+    from tb_agree
+    where agree_group_id =#{groupId,jdbcType=VARCHAR} and 
+    agree_user_id = #{userId,jdbcType=VARCHAR}
+  </select>
+  <select id="selectCountByGroupId" parameterType="string" resultType="integer">
+  	select count(agree_id) 
+  	from tb_agree
+  	where agree_group_id = #{groupId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_agree
+    where agree_id = #{agreeId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.MyAgree" >
+    <selectKey resultType="java.lang.Integer" keyProperty="agreeId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_agree (agree_id, agree_group_id, agree_user_id
+      )
+    values (#{agreeId,jdbcType=INTEGER}, #{agreeGroupId,jdbcType=VARCHAR}, #{agreeUserId,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.MyAgree" >
+    <selectKey resultType="java.lang.Integer" keyProperty="agreeId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_agree
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      agree_id,
+      <if test="agreeGroupId != null" >
+        agree_group_id,
+      </if>
+      <if test="agreeUserId != null" >
+        agree_user_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{agreeId,jdbcType=INTEGER},
+      <if test="agreeGroupId != null" >
+        #{agreeGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="agreeUserId != null" >
+        #{agreeUserId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.MyAgree" >
+    update tb_agree
+    <set >
+      <if test="agreeGroupId != null" >
+        agree_group_id = #{agreeGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="agreeUserId != null" >
+        agree_user_id = #{agreeUserId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where agree_id = #{agreeId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.MyAgree" >
+    update tb_agree
+    set agree_group_id = #{agreeGroupId,jdbcType=VARCHAR},
+      agree_user_id = #{agreeUserId,jdbcType=VARCHAR}
+    where agree_id = #{agreeId,jdbcType=INTEGER}
+  </update>
+</mapper>

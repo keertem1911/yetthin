@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.StrategyMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.Strategy" >
+    <id column="strategy_id" property="strategyId" jdbcType="VARCHAR" />
+    <result column="strategy_name" property="strategyName" jdbcType="VARCHAR" />
+    <result column="strategy_type" property="strategyType" jdbcType="CHAR" />
+    <result column="strategy_invest_cycle" property="strategyInvestCycle" jdbcType="CHAR" />
+    <result column="strategy_fund_size" property="strategyFundSize" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    strategy_id, strategy_name, strategy_type, strategy_invest_cycle, strategy_fund_size
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_strategy
+    where strategy_id = #{strategyId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_strategy
+    where strategy_id = #{strategyId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.Strategy" >
+    <selectKey resultType="java.lang.String" keyProperty="strategyId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_strategy (strategy_id, strategy_name, strategy_type, 
+      strategy_invest_cycle, strategy_fund_size)
+    values (#{strategyId,jdbcType=VARCHAR}, #{strategyName,jdbcType=VARCHAR}, #{strategyType,jdbcType=CHAR}, 
+      #{strategyInvestCycle,jdbcType=CHAR}, #{strategyFundSize,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.Strategy" >
+    <selectKey resultType="java.lang.String" keyProperty="strategyId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_strategy
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      strategy_id,
+      <if test="strategyName != null" >
+        strategy_name,
+      </if>
+      <if test="strategyType != null" >
+        strategy_type,
+      </if>
+      <if test="strategyInvestCycle != null" >
+        strategy_invest_cycle,
+      </if>
+      <if test="strategyFundSize != null" >
+        strategy_fund_size,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{strategyId,jdbcType=VARCHAR},
+      <if test="strategyName != null" >
+        #{strategyName,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyType != null" >
+        #{strategyType,jdbcType=CHAR},
+      </if>
+      <if test="strategyInvestCycle != null" >
+        #{strategyInvestCycle,jdbcType=CHAR},
+      </if>
+      <if test="strategyFundSize != null" >
+        #{strategyFundSize,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.Strategy" >
+    update tb_strategy
+    <set >
+      <if test="strategyName != null" >
+        strategy_name = #{strategyName,jdbcType=VARCHAR},
+      </if>
+      <if test="strategyType != null" >
+        strategy_type = #{strategyType,jdbcType=CHAR},
+      </if>
+      <if test="strategyInvestCycle != null" >
+        strategy_invest_cycle = #{strategyInvestCycle,jdbcType=CHAR},
+      </if>
+      <if test="strategyFundSize != null" >
+        strategy_fund_size = #{strategyFundSize,jdbcType=CHAR},
+      </if>
+    </set>
+    where strategy_id = #{strategyId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.Strategy" >
+    update tb_strategy
+    set strategy_name = #{strategyName,jdbcType=VARCHAR},
+      strategy_type = #{strategyType,jdbcType=CHAR},
+      strategy_invest_cycle = #{strategyInvestCycle,jdbcType=CHAR},
+      strategy_fund_size = #{strategyFundSize,jdbcType=CHAR}
+    where strategy_id = #{strategyId,jdbcType=VARCHAR}
+  </update>
+</mapper>

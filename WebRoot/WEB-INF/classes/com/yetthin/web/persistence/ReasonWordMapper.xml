@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yetthin.web.persistence.ReasonWordMapper" >
+  <resultMap id="BaseResultMap" type="com.yetthin.web.domain.ReasonWord" >
+    <id column="reasonword_id" property="reasonwordId" jdbcType="VARCHAR" />
+    <result column="reasonword_group_id" property="reasonwordGroupId" jdbcType="VARCHAR" />
+    <result column="reasonword_content" property="reasonwordContent" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    reasonword_id, reasonword_group_id, reasonword_content
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_reasonword
+    where reasonword_id = #{reasonwordId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_reasonword
+    where reasonword_id = #{reasonwordId,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByGroupId" parameterType="java.lang.String">
+    delete from tb_reasonword
+    where reasonword_group_id = #{groupId,jdbcType=VARCHAR}
+  
+  </delete>
+  <insert id="insert" parameterType="com.yetthin.web.domain.ReasonWord" >
+    <selectKey resultType="java.lang.String" keyProperty="reasonwordId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_reasonword (reasonword_id, reasonword_group_id, 
+      reasonword_content)
+    values (#{reasonwordId,jdbcType=VARCHAR}, #{reasonwordGroupId,jdbcType=VARCHAR}, 
+      #{reasonwordContent,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yetthin.web.domain.ReasonWord" >
+    <selectKey resultType="java.lang.String" keyProperty="reasonwordId" order="BEFORE" >
+      SELECT LAST_INSERT_ID()
+    </selectKey>
+    insert into tb_reasonword
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      reasonword_id,
+      <if test="reasonwordGroupId != null" >
+        reasonword_group_id,
+      </if>
+      <if test="reasonwordContent != null" >
+        reasonword_content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      #{reasonwordId,jdbcType=VARCHAR},
+      <if test="reasonwordGroupId != null" >
+        #{reasonwordGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonwordContent != null" >
+        #{reasonwordContent,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yetthin.web.domain.ReasonWord" >
+    update tb_reasonword
+    <set >
+      <if test="reasonwordGroupId != null" >
+        reasonword_group_id = #{reasonwordGroupId,jdbcType=VARCHAR},
+      </if>
+      <if test="reasonwordContent != null" >
+        reasonword_content = #{reasonwordContent,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where reasonword_id = #{reasonwordId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yetthin.web.domain.ReasonWord" >
+    update tb_reasonword
+    set reasonword_group_id = #{reasonwordGroupId,jdbcType=VARCHAR},
+      reasonword_content = #{reasonwordContent,jdbcType=VARCHAR}
+    where reasonword_id = #{reasonwordId,jdbcType=VARCHAR}
+  </update>
+</mapper>
